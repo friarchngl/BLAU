@@ -1,0 +1,23 @@
+# OS
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# editors
+.vscode/
+.idea/
+
+# scratch files from local preview checks
+site/_*.html
+
+# design source files — large and binary. Keep them in Drive, not in git.
+*.psd
+*.ai
+*.prproj
+*.prin
+
+# Heavy working material, ~61 MB, none of it needed to run or review the site.
+# The menu PNGs are regenerable from the PDF; everything useful from them is
+# already transcribed into docs/02-menu.md.
+assets/menu-pages/
+assets/*.pdf

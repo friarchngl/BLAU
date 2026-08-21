@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BLAU — Eatery &amp; Coffee, Kelapa Gading</title>
+<meta name="description" content="An all-day eatery and coffee bar in Kelapa Gading, Jakarta. Open daily 10.00–22.00.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
+
+<style>
+/* ============================================================
+   BLAU — design tokens
+   Brand colours sampled from the official logo files in assets/brand/.
+   ============================================================ */
+:root{
+  /* --- official brand colours, sampled from the supplied logo files --- */
+  --blau-navy:     #133A6B;   /* primary — the logo navy */
+  --blau-cream:    #F7F3EB;   /* secondary — the logo cream */
+
+  /* derived: a ground deep enough to carry the cream logo and white type */
+  --blau-navy-deep:#0C2445;
+  --blau-navy-mid: #1D4E86;
+
+  /* --- from the printed 2025 menu, kept for reference --- */
+  --menu-cover:    #2D283D;   /* menu cover ground */
+  --menu-heading:  #414889;   /* menu section headings */
+
+  /* hero surface */
+  --hero-text:     var(--blau-cream);
+  --hero-dim:      rgba(247,243,235,.82);
+  --hero-rule:     rgba(247,243,235,.28);
+
+  /* type */
+  --font: "Poppins", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* metrics */
+  --gutter: clamp(20px, 4vw, 52px);
+  --header-h: 72px;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family:var(--font);
+  background:var(--blau-navy-deep);
+  color:var(--hero-text);
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+img{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+
+/* ---------- skip link ---------- */
+.skip{
+  position:absolute;left:-9999px;top:0;z-index:100;
+  background:var(--blau-cream);color:var(--blau-navy-deep);
+  padding:12px 18px;font-size:14px;font-weight:500;
+}
+.skip:focus{left:var(--gutter);top:12px}
+
+/* ============================================================
+   HEADER — transparent over the hero, hairline rule beneath
+   ============================================================ */
+.site-header{
+  position:fixed;inset:0 0 auto 0;z-index:20;
+  height:var(--header-h);
+  display:flex;align-items:center;justify-content:space-between;
+  gap:24px;padding:0 var(--gutter);
+  transition:background-color .32s ease, box-shadow .32s ease;
+}
+/* Past the hero the header can sit over a cream section, where cream text
+   would vanish. Give it a ground once it leaves the hero. */
+.site-header.is-solid{
+  background:var(--blau-navy-deep);
+  box-shadow:0 1px 0 rgba(247,243,235,.12);
+}
+
+/* on mobile the toggle sits to the left of the wordmark */
+.header-left{display:flex;align-items:center;gap:clamp(10px,3vw,16px)}
+.brand{display:flex;align-items:center;height:100%}
+.brand img{height:19px;width:auto}
+@media (max-width:640px){.brand img{height:16px}}
+
+.nav{display:flex;align-items:center;gap:clamp(4px,1.1vw,14px)}
+/* Hover sweeps a cream ground in from the left and flips the text to navy.
+   Done with background-size rather than a pseudo-element so there is no
+   stacking context to fight. */
+.nav a{
+  position:relative;overflow:hidden;
+  display:grid;place-items:center;
+  font-size:15px;font-weight:400;letter-spacing:.01em;line-height:1;
+  padding:9px 12px;color:var(--hero-text);
+}
+/* A cream panel carrying a navy copy of the same label, wiped in from the
+   left. Because the copy sits inside the panel, the letters invert exactly
+   as the edge passes over them rather than all flipping at once. */
+.nav a::before{
+  content:attr(data-label);
+  position:absolute;inset:0;
+  display:grid;place-items:center;
+  background:var(--blau-cream);color:var(--blau-navy-deep);
+  clip-path:inset(0 100% 0 0);
+  transition:clip-path .42s cubic-bezier(.4,0,.2,1);
+}
+.nav a:hover::before,.nav a:focus-visible::before{clip-path:inset(0 0 0 0)}
+
+.nav a.cta{font-weight:600;letter-spacing:.06em;text-transform:uppercase;font-size:14px}
+/* resting underline on the CTA, flipped to navy once the panel covers it */
+.nav a.cta::after{
+  content:"";position:absolute;left:12px;right:12px;bottom:5px;
+  height:1px;background:var(--blau-cream);
+  transition:background-color .3s ease .12s;
+}
+.nav a.cta:hover::after{background:var(--blau-navy-deep)}
+
+@media (prefers-reduced-motion:reduce){
+  .nav a::before{transition-duration:.15s}
+}
+
+a:focus-visible,button:focus-visible{outline:2px solid var(--blau-cream);outline-offset:6px}
+
+/* toggle sits in a bordered square and folds into an X when open */
+.nav-toggle{
+  display:none;align-items:center;justify-content:center;
+  width:38px;height:38px;padding:0;flex:none;
+  background:none;cursor:pointer;color:var(--hero-text);
+  border:1px solid rgba(247,243,235,.4);
+}
+.nav-toggle span{
+  display:block;width:18px;height:1px;background:currentColor;position:relative;
+  transition:background-color .2s ease;
+}
+.nav-toggle span::before,.nav-toggle span::after{
+  content:"";position:absolute;left:0;width:18px;height:1px;background:currentColor;
+  transition:transform .3s cubic-bezier(.4,0,.2,1), top .3s cubic-bezier(.4,0,.2,1);
+}
+.nav-toggle span::before{top:-6px}
+.nav-toggle span::after{top:6px}
+.nav-toggle[aria-expanded="true"] span{background:transparent}
+.nav-toggle[aria-expanded="true"] span::before{top:0;transform:rotate(45deg)}
+.nav-toggle[aria-expanded="true"] span::after{top:0;transform:rotate(-45deg)}
+
+/* mobile: collapse the middle links, keep the CTA, reveal the toggle.
+   Must come after the .nav-toggle base rule or display:none wins. */
+@media (max-width:900px){
+  .nav a:not(.cta){display:none}
+  .nav-toggle{display:inline-flex}
+}
+
+/* ---------- full-screen mobile menu ---------- */
+.drawer{
+  position:fixed;inset:var(--header-h) 0 0 0;z-index:19;
+  background:var(--blau-navy-deep);
+  display:flex;flex-direction:column;
+  overflow-y:auto;overscroll-behavior:contain;
+  opacity:0;pointer-events:none;transform:translateY(-8px);
+  transition:opacity .3s ease, transform .3s ease;
+}
+.drawer[data-open="true"]{opacity:1;transform:none;pointer-events:auto}
+
+.drawer-nav{display:flex;flex-direction:column}
+.drawer-nav a{
+  display:grid;place-items:center;text-align:center;
+  padding:clamp(20px,4.6vh,36px) 20px;
+  border-bottom:1px solid rgba(247,243,235,.16);
+  font-size:clamp(21px,6.2vw,30px);font-weight:400;line-height:1.1;
+  color:var(--blau-cream);
+}
+.drawer-social{
+  display:flex;justify-content:center;align-items:center;gap:34px;
+  padding:24px 20px;border-bottom:1px solid rgba(247,243,235,.16);
+}
+.drawer-social a{display:grid;place-items:center;color:var(--blau-cream)}
+.drawer-social svg{width:21px;height:21px}
+.drawer-close{
+  width:100%;padding:22px 20px;
+  background:none;border:0;cursor:pointer;
+  font-family:inherit;font-size:15px;font-weight:500;letter-spacing:.08em;
+  color:rgba(247,243,235,.78);
+}
+.drawer-close:hover{color:var(--blau-cream)}
+
+@media (min-width:901px){.drawer{display:none}}
+
+/* ============================================================
+   HERO
+   ============================================================ */
+.hero{
+  position:relative;min-height:100svh;
+  display:grid;grid-template-rows:1fr auto;
+  padding:calc(var(--header-h) + 24px) var(--gutter) clamp(40px,7vh,80px);
+  overflow:hidden;
+}
+.hero-media{position:absolute;inset:0;z-index:0}
+.hero-media img{width:100%;height:100%;object-fit:cover;object-position:50% 56%}
+/* This photo is bright through its top two thirds (mean luminance ~205), so
+   the scrim has to be heavy there or cream type disappears into the wall.
+   The last stop is fully opaque so the hero meets the next section cleanly. */
+.hero-media::after{
+  content:"";position:absolute;inset:0;
+  background:
+    linear-gradient(180deg,
+      rgba(12,36,69,.78) 0%,
+      rgba(12,36,69,.66) 30%,
+      rgba(12,36,69,.60) 55%,
+      rgba(12,36,69,.72) 80%,
+      rgba(12,36,69,.92) 95%,
+      rgba(12,36,69,1) 100%),
+    linear-gradient(90deg, rgba(12,36,69,.28) 0%, rgba(12,36,69,0) 60%);
+}
+
+/* centred mark */
+.hero-mark{
+  position:relative;z-index:1;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:clamp(12px,1.6vw,18px);text-align:center;
+}
+/* both files are 1302px wide, so matching widths keeps the lockup aligned */
+.hero-mark img{
+  width:clamp(190px,27vw,340px);height:auto;
+  filter:drop-shadow(0 2px 24px rgba(12,36,69,.5));
+}
+.hero-mark .mark-sub{opacity:.92}
+
+/* headline block */
+.hero-copy{position:relative;z-index:1;display:grid;gap:clamp(12px,1.6vw,18px);justify-items:center;text-align:center}
+.hero-copy p{
+  margin:0;
+  font-size:clamp(15px,1.55vw,19px);font-weight:300;line-height:1.5;
+  color:var(--hero-dim);max-width:56ch;text-wrap:balance;
+}
+
+/* ============================================================
+   MENU — photo band running right to left,
+   display title sitting over the band
+   ============================================================ */
+.menu-band{
+  --gap: clamp(10px, 1.2vw, 18px);
+  --band: clamp(240px, 46vh, 470px);
+  position:relative;
+  background:var(--blau-navy-deep);
+  padding:clamp(52px,7.5vw,104px) 0;
+}
+.marquee-vp{position:relative;overflow:hidden}
+/* pushes the photos back so the display type stays readable over them */
+.marquee-vp::after{
+  content:"";position:absolute;inset:0;z-index:1;
+  background:rgba(12,36,69,.34);pointer-events:none;
+}
+.marquee{display:flex;width:max-content}
+.track{
+  display:flex;align-items:center;gap:var(--gap);
+  height:var(--band);margin:0;padding:0 var(--gap) 0 0;
+  list-style:none;
+}
+.track li{flex:none;height:100%;display:flex;overflow:hidden}
+.track li img{height:100%;width:auto;object-fit:cover}
+.track li.s{height:52%}
+.track li.m{height:74%}
+.track li.top{align-self:flex-start}
+.track li.bot{align-self:flex-end}
+
+/* the loop only runs once the duplicate track exists */
+.marquee.is-looped{animation:drift 64s linear infinite}
+@keyframes drift{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* Runs continuously by design — this band reads as footage, so it keeps
+   playing even when the OS asks for reduced motion. Deliberate: it is slow,
+   decorative, and carries no information the visitor has to track. */
+
+.menu-band-title{
+  position:absolute;left:0;right:0;top:50%;
+  transform:translateY(-50%);
+  margin:0;padding:0 var(--gutter);
+  z-index:2;pointer-events:none;text-align:center;
+  font-size:clamp(32px,8vw,116px);
+  font-weight:700;line-height:.88;letter-spacing:-.025em;
+  text-transform:uppercase;
+  color:var(--blau-cream);
+  text-shadow:0 6px 48px rgba(12,36,69,.62);
+}
+
+/* On a narrow screen only one or two photos are visible at a time, so the
+   staggered collage leaves big empty patches of ground that read as a gap.
+   Fill the band edge to edge and drop the padding so it butts straight
+   against the hero. Must sit after the base rules to win the cascade. */
+@media (max-width:620px){
+  .menu-band{
+    --band: clamp(160px, 25vh, 220px);
+    padding:0;
+  }
+  .track li.s,.track li.m{height:100%}
+  .track li.top,.track li.bot{align-self:center}
+}
+
+/* ============================================================
+   LOYALTY CARD — cream ground so the navy card reads as an
+   object sitting on it rather than a panel cut into it
+   ============================================================ */
+.loyalty{
+  background:var(--blau-cream);
+  color:var(--blau-navy);
+  padding:clamp(64px,9vw,132px) var(--gutter);
+}
+.loyalty-inner{
+  max-width:940px;margin:0 auto;
+  display:grid;justify-items:center;text-align:center;
+  gap:clamp(26px,3.6vw,46px);
+}
+.loyalty h2{
+  margin:0;
+  font-size:clamp(28px,4.8vw,56px);
+  font-weight:700;line-height:1;letter-spacing:-.022em;
+  text-transform:uppercase;color:var(--blau-navy);
+  text-wrap:balance;
+}
+.loyalty p{
+  margin:0;max-width:50ch;
+  font-size:clamp(15px,1.5vw,18px);font-weight:300;line-height:1.62;
+  color:rgba(19,58,107,.76);text-wrap:balance;
+}
+
+.card-mock{
+  margin:0;width:min(100%,520px);
+  border-radius:clamp(8px,1vw,13px);
+  overflow:hidden;background:var(--blau-navy);
+  box-shadow:
+    0 1px 2px rgba(12,36,69,.12),
+    0 10px 22px -8px rgba(12,36,69,.22),
+    0 34px 62px -26px rgba(12,36,69,.42);
+  transition:transform .5s cubic-bezier(.2,.7,.3,1), box-shadow .5s cubic-bezier(.2,.7,.3,1);
+}
+.card-mock video{display:block;width:100%;height:auto}
+@media (max-width:620px){.card-mock{width:min(80%,520px)}}
+@media (prefers-reduced-motion:no-preference){
+  .card-mock:hover{
+    transform:translateY(-7px);
+    box-shadow:
+      0 2px 4px rgba(12,36,69,.12),
+      0 16px 30px -8px rgba(12,36,69,.24),
+      0 48px 80px -28px rgba(12,36,69,.46);
+  }
+}
+
+/* ============================================================
+   WHAT'S ON — framed event cards on the dark ground
+   ============================================================ */
+.whats-on{
+  --wo-gap: clamp(14px,1.8vw,26px);
+  background:var(--blau-navy-deep);
+  padding:clamp(58px,8vw,116px) var(--gutter);
+}
+.wo-inner{max-width:1180px;margin:0 auto}
+.wo-head{
+  display:flex;align-items:baseline;justify-content:space-between;
+  flex-wrap:wrap;gap:12px 28px;
+  margin-bottom:clamp(26px,3.4vw,44px);
+}
+.wo-head h2{
+  margin:0;
+  font-size:clamp(28px,4.4vw,52px);
+  font-weight:700;line-height:1;letter-spacing:-.022em;
+  text-transform:uppercase;color:var(--blau-cream);
+}
+.wo-all{
+  position:relative;
+  font-size:13px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--blau-cream);padding-bottom:4px;
+}
+.wo-all::after{
+  content:"";position:absolute;left:0;right:0;bottom:0;height:1px;
+  background:currentColor;transform-origin:left;
+  transition:transform .3s cubic-bezier(.4,0,.2,1);
+}
+.wo-all:hover::after{transform:scaleX(0)}
+
+/* right-hand cluster: the link plus the arrows */
+.wo-tools{display:flex;align-items:center;gap:clamp(14px,2vw,28px)}
+.wo-arrows{display:flex;gap:8px}
+.wo-arrow{
+  display:grid;place-items:center;
+  width:42px;height:42px;padding:0;
+  background:transparent;color:var(--blau-cream);
+  border:1px solid rgba(247,243,235,.35);border-radius:50%;
+  cursor:pointer;
+  transition:background-color .25s ease,color .25s ease,border-color .25s ease,opacity .25s ease;
+}
+.wo-arrow:hover:not(:disabled){background:var(--blau-cream);color:var(--blau-navy-deep);border-color:var(--blau-cream)}
+.wo-arrow:disabled{opacity:.3;cursor:default}
+.wo-arrow svg{width:17px;height:17px}
+
+/* horizontal rail — same behaviour on every screen size */
+.wo-grid{
+  list-style:none;margin:0;padding:0;
+  display:flex;gap:var(--wo-gap);
+  overflow-x:auto;overscroll-behavior-x:contain;
+  scroll-snap-type:x mandatory;
+  scrollbar-width:none;-ms-overflow-style:none;
+}
+.wo-grid::-webkit-scrollbar{display:none}
+.wo-grid > li{
+  flex:0 0 calc((100% - 2*var(--wo-gap))/3);
+  display:flex;scroll-snap-align:start;
+}
+.wo-grid > li > .wo-card{flex:1}
+@media (max-width:900px){
+  .wo-grid > li{flex-basis:calc((100% - var(--wo-gap))/2)}
+}
+@media (max-width:600px){
+  /* leave a sliver of the next card visible so the rail reads as swipeable */
+  .wo-grid > li{flex-basis:82%}
+}
+
+.wo-card{
+  display:flex;flex-direction:column;height:100%;
+  padding:clamp(18px,2vw,26px);
+  border:1px solid rgba(247,243,235,.22);
+  border-radius:clamp(14px,1.7vw,22px);
+  background:transparent;
+  transition:border-color .35s ease, transform .35s cubic-bezier(.2,.7,.3,1), background-color .35s ease;
+}
+.wo-card:hover{
+  border-color:rgba(247,243,235,.55);
+  background:rgba(247,243,235,.035);
+}
+@media (prefers-reduced-motion:no-preference){
+  .wo-card:hover{transform:translateY(-5px)}
+}
+.wo-date{
+  font-size:clamp(13px,1.15vw,15px);font-weight:600;letter-spacing:.03em;
+  text-transform:uppercase;color:var(--blau-cream);
+}
+.wo-shot{
+  margin:clamp(14px,1.7vw,22px) 0 clamp(16px,2vw,26px);
+  /* the promo artwork is portrait, so the frame follows it rather than
+     cropping the headline off a square */
+  aspect-ratio:3/4;border-radius:4px;overflow:hidden;background:rgba(247,243,235,.06);
+}
+.wo-shot img{width:100%;height:100%;object-fit:cover}
+/* wide artwork squared off — bias the crop upward so the headline survives */
+.wo-shot img.pos-top{object-position:50% 24%}
+.wo-card h3{
+  margin:0 0 10px;
+  font-size:clamp(20px,2.1vw,29px);
+  font-weight:700;line-height:1.14;letter-spacing:-.015em;
+  color:var(--blau-cream);
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+}
+.wo-card p{
+  margin:0;
+  font-size:clamp(14px,1.15vw,16px);font-weight:300;line-height:1.5;
+  color:rgba(247,243,235,.74);
+  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;
+}
+
+/* ============================================================
+   FOOTER — logo, link columns, a divided CTA block, legal bar
+   ============================================================ */
+.site-footer{
+  background:var(--blau-cream);
+  color:var(--blau-navy);
+}
+.footer-main{
+  max-width:1280px;margin:0 auto;
+  padding:clamp(40px,5vw,62px) var(--gutter);
+  display:grid;
+  grid-template-columns:auto repeat(3,minmax(0,1fr)) minmax(260px,320px);
+  gap:clamp(28px,3.2vw,48px);
+  align-items:start;
+}
+.f-brand img{width:clamp(96px,11vw,140px);height:auto}
+
+.f-col h3,.f-cta h3{
+  margin:0 0 16px;
+  font-size:13px;font-weight:600;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--blau-navy);
+}
+.f-col ul{list-style:none;margin:0;padding:0;display:grid;gap:11px}
+.f-col a,.f-col span{
+  font-size:15px;font-weight:300;line-height:1.35;
+  color:rgba(19,58,107,.82);
+}
+.f-col a{position:relative;transition:color .25s ease}
+.f-col a:hover{color:var(--blau-navy)}
+.f-note{font-size:13px;color:rgba(19,58,107,.6)}
+
+/* socials */
+.f-icons{display:flex;flex-wrap:wrap;gap:12px;margin:0;padding:0;list-style:none}
+.f-icons a{
+  display:grid;place-items:center;width:44px;height:44px;
+  border:1px solid rgba(19,58,107,.35);border-radius:50%;
+  color:var(--blau-navy);
+  transition:background-color .25s ease,color .25s ease,border-color .25s ease;
+}
+.f-icons a:hover{background:var(--blau-navy);color:var(--blau-cream);border-color:var(--blau-navy)}
+.f-icons svg{width:19px;height:19px;display:block}
+
+/* CTA block */
+.f-cta{
+  border-left:1px solid rgba(19,58,107,.18);
+  padding-left:clamp(24px,2.6vw,40px);
+  display:grid;gap:14px;align-content:start;
+}
+.f-btn{
+  display:block;text-align:center;
+  padding:15px 20px;border-radius:999px;
+  font-size:14px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+  border:1.5px solid var(--blau-navy);
+  transition:background-color .28s ease,color .28s ease;
+}
+.f-btn.solid{background:var(--blau-navy);color:var(--blau-cream)}
+.f-btn.solid:hover{background:var(--blau-navy-deep);border-color:var(--blau-navy-deep)}
+.f-btn.ghost{background:transparent;color:var(--blau-navy)}
+.f-btn.ghost:hover{background:var(--blau-navy);color:var(--blau-cream)}
+
+/* legal bar */
+.footer-bottom{
+  border-top:1px solid rgba(19,58,107,.18);
+}
+.footer-bottom-in{
+  max-width:1280px;margin:0 auto;
+  padding:18px var(--gutter);
+  display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;
+  gap:10px 28px;
+  font-size:13px;font-weight:300;color:rgba(19,58,107,.66);
+}
+.footer-bottom-in nav{display:flex;flex-wrap:wrap;gap:10px 26px}
+.footer-bottom-in a{transition:color .25s ease}
+.footer-bottom-in a:hover{color:var(--blau-navy)}
+
+/* Footer responsive — these MUST come after the base rules above, otherwise
+   the base .f-cta border-left wins on equal specificity and reappears on mobile. */
+@media (max-width:1080px){
+  .footer-main{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .f-brand{grid-column:1/-1}
+  .f-cta{
+    grid-column:1/-1;
+    border-left:0;padding-left:0;
+    padding-top:26px;border-top:1px solid rgba(19,58,107,.18);
+  }
+}
+@media (max-width:620px){
+  .footer-main{grid-template-columns:1fr 1fr}
+  .f-socials{grid-column:1/-1}
+  .f-icons{flex-direction:row}
+}
+
+/* load-in */
+@media (prefers-reduced-motion:no-preference){
+  .fade{opacity:0;transform:translateY(14px);animation:rise .9s cubic-bezier(.22,.7,.3,1) forwards}
+  .fade.d1{animation-delay:.10s}
+  .fade.d2{animation-delay:.26s}
+  .fade.d3{animation-delay:.38s}
+  @keyframes rise{to{opacity:1;transform:none}}
+}
+</style>
+</head>
+<body>
+
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site-header">
+  <div class="header-left">
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="drawer" aria-label="Open menu">
+      <span></span>
+    </button>
+    <a class="brand" href="/" aria-label="BLAU — home">
+      <img src="assets/brand/blau-cream.png" alt="BLAU">
+    </a>
+  </div>
+
+  <nav class="nav" aria-label="Primary">
+    <a href="#menu" data-label="Menu">Menu</a>
+    <a href="#whatson" data-label="What&rsquo;s On">What&rsquo;s On</a>
+    <a href="#about" data-label="About">About</a>
+    <a href="#visit" data-label="Visit">Visit</a>
+    <a class="cta" href="https://wa.me/6281999718181" data-label="Book Now">Book Now</a>
+  </nav>
+</header>
+
+<div class="drawer" id="drawer" data-open="false">
+  <nav class="drawer-nav" aria-label="Mobile">
+    <a href="#menu">Menu</a>
+    <a href="#whatson">What&rsquo;s On</a>
+    <a href="#about">About</a>
+    <a href="#visit">Visit</a>
+    <a href="https://wa.me/6281999718181">Book Now</a>
+  </nav>
+  <div class="drawer-social">
+    <a href="https://www.instagram.com/blau.id/" aria-label="BLAU on Instagram">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+        <rect x="3" y="3" width="18" height="18" rx="5"/>
+        <circle cx="12" cy="12" r="4"/>
+        <circle cx="17.3" cy="6.7" r="1.15" fill="currentColor" stroke="none"/>
+      </svg>
+    </a>
+    <a href="https://www.facebook.com/blau.eatery/" aria-label="BLAU on Facebook">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M13.5 21v-8h2.7l.4-3.1h-3.1V7.9c0-.9.25-1.5 1.55-1.5h1.65V3.6c-.29-.04-1.27-.13-2.4-.13-2.38 0-4 1.45-4 4.11V9.9H7.6V13h2.7v8h3.2z"/>
+      </svg>
+    </a>
+  </div>
+  <button class="drawer-close" type="button">Close</button>
+</div>
+
+<main id="main">
+  <section class="hero">
+    <div class="hero-media">
+      <img src="assets/hero.jpg" alt="Cold brew being poured over ice at the BLAU bar" fetchpriority="high">
+    </div>
+
+    <div class="hero-mark fade d1">
+      <img class="mark-word" src="assets/brand/blau-cream.png" alt="BLAU">
+      <img class="mark-sub" src="assets/brand/eatery-coffee-cream.png" alt="Eatery &amp; Coffee">
+    </div>
+
+    <div class="hero-copy">
+      <p class="fade d2">An all-day eatery and coffee bar in Kelapa Gading. Open daily, 10.00&ndash;22.00.</p>
+    </div>
+  </section>
+
+  <section class="menu-band" id="menu" aria-labelledby="menu-band-title">
+    <div class="marquee-vp">
+      <div class="marquee">
+        <ul class="track">
+          <li class="top"><img src="assets/strip/gochujang.jpg" alt="Gochujang chicken in a BLAU basket"></li>
+          <li class="m bot"><img src="assets/strip/kidsmeal.jpg" alt="Kids meal bowls"></li>
+          <li class="s"><img src="assets/strip/aglio.jpg" alt="Aglio oglio with parmesan"></li>
+          <li class="bot"><img src="assets/strip/saltedegg.jpg" alt="Salted egg chicken with sunny side up"></li>
+          <li class="m top"><img src="assets/strip/mantau.jpg" alt="Mantau with dipping sauce"></li>
+          <li class="s"><img src="assets/strip/saikoro.jpg" alt="Saikoro maranggi skewers"></li>
+          <li class="top"><img src="assets/strip/fries.jpg" alt="Loaded fries"></li>
+          <li class="m bot"><img src="assets/strip/affogato.jpg" alt="Espresso poured over ice cream"></li>
+          <li class="s top"><img src="assets/strip/thaitea.jpg" alt="Iced Thai tea"></li>
+          <li><img src="assets/strip/sweetsour.jpg" alt="Sweet and sour chicken"></li>
+          <li class="m bot"><img src="assets/strip/artisantea.jpg" alt="Artisan tea service"></li>
+          <li class="m top"><img src="assets/strip/pepperpork.jpg" alt="Salt and pepper pork"></li>
+        </ul>
+      </div>
+    </div>
+    <h2 class="menu-band-title" id="menu-band-title">Menu</h2>
+  </section>
+
+  <section class="loyalty" id="loyalty" aria-labelledby="loyalty-title">
+    <div class="loyalty-inner">
+      <h2 id="loyalty-title">Loyalty Card</h2>
+      <figure class="card-mock">
+        <video src="assets/loyalty/loyalty-card.mp4"
+               poster="assets/loyalty/loyalty-card-poster.jpg"
+               autoplay muted loop playsinline preload="metadata"
+               aria-label="BLAU loyalty card filling up with stamps"></video>
+      </figure>
+      <p>One stamp for every 100k spent. Free iced lemon tea at five, free black or white coffee at eight, and Rp50.000 back at ten.</p>
+    </div>
+  </section>
+
+  <!-- PLACEHOLDER CONTENT — dates and copy need replacing with real events -->
+  <section class="whats-on" id="whatson" aria-labelledby="whatson-title">
+    <div class="wo-inner">
+      <div class="wo-head">
+        <h2 id="whatson-title">What&rsquo;s On</h2>
+        <div class="wo-tools">
+          <a class="wo-all" href="#">View all events</a>
+          <div class="wo-arrows">
+            <button class="wo-arrow" type="button" data-dir="-1" aria-label="Previous events" aria-controls="wo-rail">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 5l-7 7 7 7"/></svg>
+            </button>
+            <button class="wo-arrow" type="button" data-dir="1" aria-label="Next events" aria-controls="wo-rail">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 5l7 7-7 7"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+      <ul class="wo-grid" id="wo-rail" tabindex="0" aria-label="Events, scrollable">
+        <li>
+          <a class="wo-card" href="#">
+            <span class="wo-date">Every Wednesday</span>
+            <div class="wo-shot"><img src="assets/promo/b1g1-coffee.jpg" alt="Buy one get one free coffee" loading="lazy"></div>
+            <h3>Buy 1 Get 1 Coffee</h3>
+            <p>Americano, Long Black, Latte, Cappuccino or Kopi Susu Bro. The cheaper cup is on us.</p>
+          </a>
+        </li>
+        <li>
+          <a class="wo-card" href="#">
+            <span class="wo-date">Every Thursday</span>
+            <div class="wo-shot"><img src="assets/promo/healthy-thursday.jpg" alt="Healthy Thursday, 15% off juice and salad" loading="lazy"></div>
+            <h3>Healthy Thursday, 15% Off</h3>
+            <p>Juice and salad all day. Dragon Berry, Watermelon, Sun-kissed, Ice Lime, Avocado, Caesar Salad and Blau Salad.</p>
+          </a>
+        </li>
+        <li>
+          <a class="wo-card" href="#">
+            <span class="wo-date">Students, dine in</span>
+            <div class="wo-shot"><img src="assets/promo/student-25.jpg" alt="Student promo, 25% off coffee and mocktails" loading="lazy"></div>
+            <h3>25% Off Coffee &amp; Mocktails</h3>
+            <p>Show your student card. One item per transaction per day, and tag us in your story to redeem.</p>
+          </a>
+        </li>
+        <li>
+          <a class="wo-card" href="#">
+            <span class="wo-date">Review &amp; follow</span>
+            <div class="wo-shot"><img src="assets/promo/free-affogato.jpg" alt="Free affogato for a Google review and follow" loading="lazy"></div>
+            <h3>Free Affogato</h3>
+            <p>Review us on Google, follow us on Instagram, then show our staff. An ice cream sundae works too.</p>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </section>
+</main>
+
+<footer class="site-footer">
+  <div class="footer-main">
+    <div class="f-brand">
+      <img src="assets/brand/blau-navy.png" alt="BLAU">
+    </div>
+
+    <nav class="f-col" aria-label="Visit">
+      <h3>Visit</h3>
+      <ul>
+        <li><span>Jl. Pelepah Elok I QA2/7</span></li>
+        <li><span>Kelapa Gading, Jakarta Utara</span></li>
+        <li><span>Daily, 10.00&ndash;22.00</span></li>
+        <li><a href="https://maps.google.com/?q=Blau+Eatery+%26+Coffee+Kelapa+Gading">Get directions</a></li>
+      </ul>
+    </nav>
+
+    <nav class="f-col" aria-label="Order now">
+      <h3>Order Now</h3>
+      <ul>
+        <li><a href="https://wa.me/6281999718181">WhatsApp</a></li>
+        <li><a href="https://gofood.co.id/en/jakarta/restaurant/blau-eatery-coffee-41353093-a30a-4326-bda5-1f50cb8c7658">GoFood</a></li>
+        <li><a href="#">GrabFood</a></li>
+        <li><a href="#menu">Menu</a></li>
+      </ul>
+    </nav>
+
+    <div class="f-col f-socials">
+      <h3>Our Socials</h3>
+      <ul class="f-icons">
+        <li>
+          <a href="https://www.instagram.com/blau.id/" aria-label="BLAU on Instagram">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+              <rect x="3" y="3" width="18" height="18" rx="5"/>
+              <circle cx="12" cy="12" r="4"/>
+              <circle cx="17.3" cy="6.7" r="1.15" fill="currentColor" stroke="none"/>
+            </svg>
+          </a>
+        </li>
+        <li>
+          <a href="https://www.facebook.com/blau.eatery/" aria-label="BLAU on Facebook">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M13.5 21v-8h2.7l.4-3.1h-3.1V7.9c0-.9.25-1.5 1.55-1.5h1.65V3.6c-.29-.04-1.27-.13-2.4-.13-2.38 0-4 1.45-4 4.11V9.9H7.6V13h2.7v8h3.2z"/>
+            </svg>
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <div class="f-cta">
+      <h3>Stamps, rewards &amp; more</h3>
+      <a class="f-btn solid" href="#loyalty">Loyalty Card</a>
+      <a class="f-btn ghost" href="https://wa.me/6281999718181">Book Now</a>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <div class="footer-bottom-in">
+      <span>&copy; 2026 BLAU Eatery &amp; Coffee. All rights reserved.</span>
+      <nav aria-label="Legal">
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms &amp; Conditions</a>
+      </nav>
+      <span>Kelapa Gading, Jakarta</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var btn = document.querySelector('.nav-toggle');
+  var drawer = document.getElementById('drawer');
+  if(!btn || !drawer) return;
+
+  function setOpen(open){
+    drawer.dataset.open = open ? 'true' : 'false';
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    btn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    /* the panel scrolls on its own, so lock the page behind it */
+    document.body.style.overflow = open ? 'hidden' : '';
+  }
+  btn.addEventListener('click', function(){
+    setOpen(drawer.dataset.open !== 'true');
+  });
+  drawer.addEventListener('click', function(e){
+    if(e.target.closest('a') || e.target.closest('.drawer-close')) setOpen(false);
+  });
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape' && drawer.dataset.open === 'true'){ setOpen(false); btn.focus(); }
+  });
+})();
+
+/* Header gains a solid ground once it leaves the hero, so cream nav text
+   stays readable over the light sections below. */
+(function(){
+  var header = document.querySelector('.site-header');
+  var hero = document.querySelector('.hero');
+  if(!header || !hero || !('IntersectionObserver' in window)) return;
+
+  var headerH = parseInt(getComputedStyle(document.documentElement)
+    .getPropertyValue('--header-h'), 10) || 72;
+
+  new IntersectionObserver(function(entries){
+    header.classList.toggle('is-solid', !entries[0].isIntersecting);
+  }, { rootMargin: '-' + headerH + 'px 0px 0px 0px', threshold: 0 }).observe(hero);
+})();
+
+/* What's On — arrow buttons drive the rail one card at a time, and disable
+   themselves at each end. Native scroll and swipe still work on their own. */
+(function(){
+  var rail = document.getElementById('wo-rail');
+  var arrows = document.querySelectorAll('.wo-arrow');
+  if(!rail || !arrows.length) return;
+
+  function step(){
+    var card = rail.querySelector('li');
+    if(!card) return rail.clientWidth * 0.8;
+    var gap = parseFloat(getComputedStyle(rail).columnGap) || 0;
+    return card.getBoundingClientRect().width + gap;
+  }
+  function sync(){
+    var max = rail.scrollWidth - rail.clientWidth - 2;
+    arrows[0].disabled = rail.scrollLeft <= 2;
+    arrows[1].disabled = rail.scrollLeft >= max;
+  }
+  arrows.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      rail.scrollBy({ left: step() * Number(btn.dataset.dir), behavior: 'smooth' });
+    });
+  });
+  rail.addEventListener('scroll', sync, { passive:true });
+  window.addEventListener('resize', sync);
+  sync();
+})();
+
+/* Menu band — duplicate the track so the marquee loops seamlessly.
+   Cloning at runtime keeps each photo in the markup exactly once. */
+(function(){
+  var marquee = document.querySelector('.marquee');
+  var track = marquee && marquee.querySelector('.track');
+  if(!marquee || !track) return;
+
+  var clone = track.cloneNode(true);
+  clone.setAttribute('aria-hidden','true');
+  clone.querySelectorAll('img').forEach(function(img){ img.alt = ''; });
+  marquee.appendChild(clone);
+  marquee.classList.add('is-looped');
+})();
+</script>
+</body>
+</html>
