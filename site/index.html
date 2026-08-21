@@ -413,6 +413,8 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--blau-cream);outline
 @media (max-width:600px){
   /* leave a sliver of the next card visible so the rail reads as swipeable */
   .wo-grid > li{flex-basis:82%}
+  /* swipe replaces the arrows on touch, so drop them */
+  .wo-arrows{display:none}
 }
 
 .wo-card{
@@ -474,7 +476,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--blau-cream);outline
 }
 .f-brand img{width:clamp(96px,11vw,140px);height:auto}
 
-.f-col h3,.f-cta h3{
+.f-col h3{
   margin:0 0 16px;
   font-size:13px;font-weight:600;letter-spacing:.09em;
   text-transform:uppercase;color:var(--blau-navy);
@@ -762,7 +764,6 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--blau-cream);outline
     </div>
 
     <div class="f-cta">
-      <h3>Stamps, rewards &amp; more</h3>
       <a class="f-btn solid" href="#loyalty">Loyalty Card</a>
       <a class="f-btn ghost" href="https://wa.me/6281999718181">Book Now</a>
     </div>
