@@ -235,6 +235,171 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--blau-cream);outline
 }
 
 /* ============================================================
+   COFFEE BULK ORDER — pinned stage. Each bottle sits on a panel
+   tinted from its own label, and the next panel wipes in from the
+   right as you scroll, carrying its bottle and name with it.
+   ============================================================ */
+.bulk{
+  --step: 46vh;               /* scroll distance per bottle */
+  position:relative;
+  height:calc(100vh + 7 * var(--step));
+  background:var(--blau-navy-deep);
+}
+.bulk-pin{
+  position:sticky;top:0;
+  height:100vh;overflow:hidden;
+}
+.bulk-slide{
+  position:absolute;inset:0;
+  background:var(--ground);
+  display:grid;
+  grid-template-columns:1fr auto 1fr;
+  align-items:center;
+  padding:calc(var(--header-h) + 40px) var(--gutter) 92px;
+  /* wipes in from the right edge; slide 0 is left fully open by the script */
+  clip-path:inset(0 0 0 100%);
+}
+.bulk-slide img{
+  grid-column:2;
+  height:min(62vh,530px);width:auto;
+  justify-self:center;
+}
+.bulk-name{
+  grid-column:1;grid-row:1;
+  justify-self:start;align-self:center;
+  font-size:clamp(26px,4.4vw,58px);
+  font-weight:700;line-height:1.02;letter-spacing:-.02em;
+  color:var(--blau-cream);max-width:7ch;
+  text-wrap:balance;
+}
+.bulk-note{
+  grid-column:3;grid-row:1;
+  justify-self:end;align-self:center;
+  max-width:26ch;text-align:left;
+  font-size:clamp(13px,1.1vw,15px);font-weight:300;line-height:1.6;
+  color:rgba(247,243,235,.82);
+}
+
+/* chrome that sits above every panel */
+.bulk-head,.bulk-foot{
+  position:absolute;left:var(--gutter);right:var(--gutter);z-index:10;
+  display:flex;align-items:center;justify-content:space-between;gap:16px;
+  pointer-events:none;
+}
+.bulk-head{top:calc(var(--header-h) + 22px)}
+.bulk-foot{bottom:34px}
+.bulk-head h2{
+  margin:0;
+  font-size:clamp(13px,1.15vw,15px);font-weight:600;
+  letter-spacing:.16em;text-transform:uppercase;color:var(--blau-cream);
+}
+.bulk-count{
+  font-size:13px;font-weight:500;letter-spacing:.1em;
+  color:rgba(247,243,235,.7);font-variant-numeric:tabular-nums;
+}
+.bulk-dots{display:flex;gap:7px}
+.bulk-dots span{
+  width:7px;height:7px;border-radius:50%;
+  background:rgba(247,243,235,.32);
+  transition:background-color .3s ease,transform .3s ease;
+}
+.bulk-dots span.on{background:var(--blau-cream);transform:scale(1.35)}
+.bulk-cta{
+  pointer-events:auto;
+  font-size:13px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--blau-cream);padding-bottom:4px;
+  border-bottom:1px solid rgba(247,243,235,.55);
+  transition:border-color .25s ease;
+}
+.bulk-cta:hover{border-color:var(--blau-cream)}
+
+@media (max-width:820px){
+  .bulk{--step:38vh}
+  .bulk-slide{
+    grid-template-columns:1fr;
+    justify-items:center;text-align:center;
+    padding:calc(var(--header-h) + 56px) var(--gutter) 92px;
+    align-content:center;gap:20px;
+  }
+  .bulk-slide img{grid-column:1;grid-row:2;height:min(48vh,390px)}
+  .bulk-name{grid-column:1;grid-row:1;justify-self:center;max-width:none}
+  .bulk-note{display:none}
+}
+
+/* ============================================================
+   OPEN KITCHEN — take-home products. Each card rests on its
+   packaging shot and crossfades to the product itself on hover.
+   ============================================================ */
+.kitchen{
+  background:var(--blau-cream);
+  color:var(--blau-navy);
+  padding:clamp(56px,8vw,116px) var(--gutter);
+}
+.kitchen-inner{
+  max-width:1280px;margin:0 auto;
+  display:grid;grid-template-columns:minmax(220px,1fr) 2.4fr;
+  gap:clamp(28px,4vw,64px);align-items:start;
+}
+.kitchen-intro h2{
+  margin:0 0 14px;
+  font-size:clamp(28px,4.4vw,52px);
+  font-weight:700;line-height:1;letter-spacing:-.022em;
+  text-transform:uppercase;color:var(--blau-navy);
+}
+.kitchen-intro p{
+  margin:0 0 22px;max-width:34ch;
+  font-size:clamp(14px,1.2vw,16px);font-weight:300;line-height:1.6;
+  color:rgba(19,58,107,.76);
+}
+.kitchen-cta{
+  display:inline-block;
+  padding:13px 22px;border-radius:999px;
+  background:var(--blau-navy);color:var(--blau-cream);
+  font-size:13px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;
+  transition:background-color .28s ease;
+}
+.kitchen-cta:hover{background:var(--blau-navy-deep)}
+
+.kitchen-grid{
+  list-style:none;margin:0;padding:0;
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:clamp(18px,2.4vw,34px);
+}
+.ok-card{display:block}
+.ok-shot{
+  position:relative;aspect-ratio:1/1;overflow:hidden;
+  background:var(--blau-cream);
+  border:1px solid rgba(19,58,107,.14);
+}
+.ok-shot img{
+  position:absolute;inset:0;
+  width:100%;height:100%;object-fit:cover;
+  transition:opacity .45s ease;
+}
+.ok-shot .ok-bare{opacity:0}
+.ok-card:hover .ok-shot .ok-pack,
+.ok-card:focus-visible .ok-shot .ok-pack{opacity:0}
+.ok-card:hover .ok-shot .ok-bare,
+.ok-card:focus-visible .ok-shot .ok-bare{opacity:1}
+
+.ok-card h3{
+  margin:14px 0 3px;
+  font-size:clamp(15px,1.35vw,18px);font-weight:600;letter-spacing:.02em;
+  color:var(--blau-navy);
+}
+.ok-card span{
+  font-size:clamp(13px,1.1vw,15px);font-weight:300;
+  color:rgba(19,58,107,.66);
+}
+
+@media (max-width:880px){
+  .kitchen-inner{grid-template-columns:1fr}
+}
+@media (max-width:460px){
+  .kitchen-grid{grid-template-columns:1fr}
+}
+
+/* ============================================================
    MENU — photo band running right to left,
    display title sitting over the band
    ============================================================ */
@@ -304,7 +469,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--blau-cream);outline
 .loyalty{
   background:var(--blau-cream);
   color:var(--blau-navy);
-  padding:clamp(64px,9vw,132px) var(--gutter);
+  padding:clamp(48px,6.5vw,92px) var(--gutter);
 }
 .loyalty-inner{
   max-width:940px;margin:0 auto;
@@ -325,8 +490,8 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--blau-cream);outline
 }
 
 .card-mock{
-  margin:0;width:min(100%,520px);
-  border-radius:clamp(8px,1vw,13px);
+  margin:0;width:min(100%,420px);
+  border-radius:clamp(7px,.9vw,11px);
   overflow:hidden;background:var(--blau-navy);
   box-shadow:
     0 1px 2px rgba(12,36,69,.12),
@@ -335,7 +500,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--blau-cream);outline
   transition:transform .5s cubic-bezier(.2,.7,.3,1), box-shadow .5s cubic-bezier(.2,.7,.3,1);
 }
 .card-mock video{display:block;width:100%;height:auto}
-@media (max-width:620px){.card-mock{width:min(80%,520px)}}
+@media (max-width:620px){.card-mock{width:min(68%,420px)}}
 @media (prefers-reduced-motion:no-preference){
   .card-mock:hover{
     transform:translateY(-7px);
@@ -491,7 +656,12 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--blau-cream);outline
 .f-note{font-size:13px;color:rgba(19,58,107,.6)}
 
 /* socials */
-.f-icons{display:flex;flex-wrap:wrap;gap:12px;margin:0;padding:0;list-style:none}
+/* .f-col ul above sets display:grid and is more specific, which stacked these
+   into a column. Scoped selector so the row wins on specificity, not order. */
+.f-col ul.f-icons{
+  display:flex;flex-direction:row;flex-wrap:wrap;
+  gap:12px;margin:0;padding:0;list-style:none;
+}
 .f-icons a{
   display:grid;place-items:center;width:44px;height:44px;
   border:1px solid rgba(19,58,107,.35);border-radius:50%;
@@ -548,7 +718,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--blau-cream);outline
 @media (max-width:620px){
   .footer-main{grid-template-columns:1fr 1fr}
   .f-socials{grid-column:1/-1}
-  .f-icons{flex-direction:row}
+  .f-col ul.f-icons{flex-direction:row}
 }
 
 /* load-in */
@@ -625,6 +795,111 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--blau-cream);outline
     </div>
   </section>
 
+  <section class="bulk" id="bulk" aria-labelledby="bulk-title">
+    <div class="bulk-pin">
+      <div class="bulk-head">
+        <h2 id="bulk-title">Coffee Bulk Order</h2>
+        <span class="bulk-count">01 / 08</span>
+      </div>
+
+      <article class="bulk-slide" style="--ground:#732B2A;z-index:1" data-name="Americano">
+        <p class="bulk-name">Americano</p>
+        <img src="assets/bottles/americano.jpg" alt="BLAU Americano in a bulk bottle" loading="lazy">
+        <p class="bulk-note">Straight and cold. Nothing added.</p>
+      </article>
+      <article class="bulk-slide" style="--ground:#2E344E;z-index:2" data-name="Blau Signature">
+        <p class="bulk-name">Blau Signature</p>
+        <img src="assets/bottles/blau-signature.jpg" alt="BLAU Blau Signature in a bulk bottle" loading="lazy">
+        <p class="bulk-note">The house pour, bottled as it is served.</p>
+      </article>
+      <article class="bulk-slide" style="--ground:#816750;z-index:3" data-name="Kopi Susu Bro">
+        <p class="bulk-name">Kopi Susu Bro</p>
+        <img src="assets/bottles/kopi-susu-bro.jpg" alt="BLAU Kopi Susu Bro in a bulk bottle" loading="lazy">
+        <p class="bulk-note">Palm sugar and milk. The everyday one.</p>
+      </article>
+      <article class="bulk-slide" style="--ground:#5B3E33;z-index:4" data-name="Latte">
+        <p class="bulk-name">Latte</p>
+        <img src="assets/bottles/latte.jpg" alt="BLAU Latte in a bulk bottle" loading="lazy">
+        <p class="bulk-note">Espresso and milk, balanced for keeping cold.</p>
+      </article>
+      <article class="bulk-slide" style="--ground:#322724;z-index:5" data-name="Chocolate">
+        <p class="bulk-name">Chocolate</p>
+        <img src="assets/bottles/chocolate.jpg" alt="BLAU Chocolate in a bulk bottle" loading="lazy">
+        <p class="bulk-note">Dark and thick, not sweet.</p>
+      </article>
+      <article class="bulk-slide" style="--ground:#535E40;z-index:6" data-name="Matcha">
+        <p class="bulk-name">Matcha</p>
+        <img src="assets/bottles/matcha.jpg" alt="BLAU Matcha in a bulk bottle" loading="lazy">
+        <p class="bulk-note">Stone-ground, whisked to order.</p>
+      </article>
+      <article class="bulk-slide" style="--ground:#5F346A;z-index:7" data-name="Taro">
+        <p class="bulk-name">Taro</p>
+        <img src="assets/bottles/taro.jpg" alt="BLAU Taro in a bulk bottle" loading="lazy">
+        <p class="bulk-note">Creamy, mild, and quietly popular.</p>
+      </article>
+      <article class="bulk-slide" style="--ground:#A05530;z-index:8" data-name="Thai Tea">
+        <p class="bulk-name">Thai Tea</p>
+        <img src="assets/bottles/thai-tea.jpg" alt="BLAU Thai Tea in a bulk bottle" loading="lazy">
+        <p class="bulk-note">Strong brew, condensed milk, plenty of ice.</p>
+      </article>
+
+      <div class="bulk-foot">
+        <div class="bulk-dots" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+        <a class="bulk-cta" href="https://wa.me/6281999718181">Order by the crate</a>
+      </div>
+    </div>
+  </section>
+  <section class="kitchen" id="kitchen" aria-labelledby="kitchen-title">
+    <div class="kitchen-inner">
+      <div class="kitchen-intro">
+        <h2 id="kitchen-title">Open Kitchen</h2>
+        <p>What we cook here, packed to take home. Frozen, sealed, and ready for your own kitchen.</p>
+        <a class="kitchen-cta" href="https://wa.me/6281999718181">Order on WhatsApp</a>
+      </div>
+      <ul class="kitchen-grid">
+        <li>
+          <a class="ok-card" href="https://wa.me/6281999718181">
+            <div class="ok-shot">
+              <img class="ok-pack" src="assets/kitchen/pisang-pack.jpg" alt="Pisang Pontianak fritters, packed" loading="lazy">
+              <img class="ok-bare" src="assets/kitchen/pisang-bare.jpg" alt="Pisang Pontianak fritters, out of the pack" loading="lazy" aria-hidden="true">
+            </div>
+            <h3>Pisang Pontianak</h3>
+            <span>10 pcs per pack</span>
+          </a>
+        </li>
+        <li>
+          <a class="ok-card" href="https://wa.me/6281999718181">
+            <div class="ok-shot">
+              <img class="ok-pack" src="assets/kitchen/saikoro-pack.jpg" alt="Diced saikoro beef, packed" loading="lazy">
+              <img class="ok-bare" src="assets/kitchen/saikoro-bare.jpg" alt="Diced saikoro beef, out of the pack" loading="lazy" aria-hidden="true">
+            </div>
+            <h3>Saikoro Beef</h3>
+            <span>80 gr per pack</span>
+          </a>
+        </li>
+        <li>
+          <a class="ok-card" href="https://wa.me/6281999718181">
+            <div class="ok-shot">
+              <img class="ok-pack" src="assets/kitchen/sambal-pack.jpg" alt="House sambal korek, packed" loading="lazy">
+              <img class="ok-bare" src="assets/kitchen/sambal-bare.jpg" alt="House sambal korek, out of the pack" loading="lazy" aria-hidden="true">
+            </div>
+            <h3>Sambal Korek</h3>
+            <span>700 gr per tub</span>
+          </a>
+        </li>
+        <li>
+          <a class="ok-card" href="https://wa.me/6281999718181">
+            <div class="ok-shot">
+              <img class="ok-pack" src="assets/kitchen/dripbag-pack.jpg" alt="BLAU House Blend drip bags, packed" loading="lazy">
+              <img class="ok-bare" src="assets/kitchen/dripbag-bare.jpg" alt="BLAU House Blend drip bags, out of the pack" loading="lazy" aria-hidden="true">
+            </div>
+            <h3>House Blend Drip</h3>
+            <span>5 sachets</span>
+          </a>
+        </li>
+      </ul>
+    </div>
+  </section>
   <section class="menu-band" id="menu" aria-labelledby="menu-band-title">
     <div class="marquee-vp">
       <div class="marquee">
@@ -656,7 +931,6 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--blau-cream);outline
                autoplay muted loop playsinline preload="metadata"
                aria-label="BLAU loyalty card filling up with stamps"></video>
       </figure>
-      <p>One stamp for every 100k spent. Free iced lemon tea at five, free black or white coffee at eight, and Rp50.000 back at ten.</p>
     </div>
   </section>
 
@@ -818,6 +1092,49 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--blau-cream);outline
   new IntersectionObserver(function(entries){
     header.classList.toggle('is-solid', !entries[0].isIntersecting);
   }, { rootMargin: '-' + headerH + 'px 0px 0px 0px', threshold: 0 }).observe(hero);
+})();
+
+/* Coffee Bulk Order — scroll through the pinned stage drives a wipe.
+   Slide i is revealed from the right as progress moves from i-1 to i, so the
+   outgoing bottle and name stay put on the left until the edge passes them. */
+(function(){
+  var track  = document.querySelector('.bulk');
+  var slides = [].slice.call(document.querySelectorAll('.bulk-slide'));
+  var dots   = [].slice.call(document.querySelectorAll('.bulk-dots span'));
+  var count  = document.querySelector('.bulk-count');
+  if(!track || slides.length < 2) return;
+
+  var last = -1, ticking = false;
+
+  function paint(){
+    ticking = false;
+    var span = track.offsetHeight - window.innerHeight;
+    if(span <= 0) return;
+
+    var p = -track.getBoundingClientRect().top / span;
+    p = Math.max(0, Math.min(1, p));
+    var pos = p * (slides.length - 1);
+
+    for(var i = 0; i < slides.length; i++){
+      var t = Math.max(0, Math.min(1, pos - (i - 1)));
+      slides[i].style.clipPath = 'inset(0 0 0 ' + (1 - t) * 100 + '%)';
+    }
+
+    var active = Math.round(pos);
+    if(active !== last){
+      last = active;
+      for(var d = 0; d < dots.length; d++) dots[d].classList.toggle('on', d === active);
+      if(count) count.textContent = '0' + (active + 1) + ' / 0' + slides.length;
+    }
+  }
+
+  function onScroll(){
+    if(!ticking){ ticking = true; requestAnimationFrame(paint); }
+  }
+
+  window.addEventListener('scroll', onScroll, { passive:true });
+  window.addEventListener('resize', onScroll);
+  paint();
 })();
 
 /* What's On — arrow buttons drive the rail one card at a time, and disable
