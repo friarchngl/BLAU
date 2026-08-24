@@ -268,7 +268,8 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--blau-cream);outline
 .bulk{
   --step: 46vh;               /* scroll distance per bottle */
   position:relative;
-  height:calc(100vh + 7 * var(--step));
+  /* (slide count - 1) steps of scroll for the wipe to complete */
+  height:calc(100vh + 1 * var(--step));
   background:var(--blau-navy-deep);
 }
 .bulk-pin{
@@ -287,7 +288,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--blau-cream);outline
 }
 .bulk-slide img{
   grid-column:2;
-  height:min(62vh,530px);width:auto;
+  height:min(72vh,620px);width:auto;
   justify-self:center;
 }
 .bulk-name{
@@ -307,21 +308,16 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--blau-cream);outline
 }
 
 /* chrome that sits above every panel */
-.bulk-head,.bulk-foot{
+.bulk-head{
   position:absolute;left:var(--gutter);right:var(--gutter);z-index:10;
+  top:calc(var(--header-h) + 22px);
   display:flex;align-items:center;justify-content:space-between;gap:16px;
   pointer-events:none;
 }
-.bulk-head{top:calc(var(--header-h) + 22px)}
-.bulk-foot{bottom:34px}
 .bulk-head h2{
   margin:0;
   font-size:clamp(13px,1.15vw,15px);font-weight:600;
   letter-spacing:.16em;text-transform:uppercase;color:var(--blau-cream);
-}
-.bulk-count{
-  font-size:13px;font-weight:500;letter-spacing:.1em;
-  color:rgba(247,243,235,.7);font-variant-numeric:tabular-nums;
 }
 .bulk-dots{display:flex;gap:7px}
 .bulk-dots span{
@@ -330,14 +326,27 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--blau-cream);outline
   transition:background-color .3s ease,transform .3s ease;
 }
 .bulk-dots span.on{background:var(--blau-cream);transform:scale(1.35)}
+
+/* CTA — its own row, centred, sized like the rest of the site's buttons */
+.bulk-foot{
+  position:absolute;left:var(--gutter);right:var(--gutter);z-index:10;
+  bottom:clamp(28px,5vh,52px);
+  display:flex;justify-content:center;
+  pointer-events:none;
+}
 .bulk-cta{
   pointer-events:auto;
-  font-size:13px;font-weight:600;letter-spacing:.09em;text-transform:uppercase;
-  color:var(--blau-cream);padding-bottom:4px;
-  border-bottom:1px solid rgba(247,243,235,.55);
-  transition:border-color .25s ease;
+  display:inline-block;
+  padding:17px 42px;border-radius:999px;
+  background:var(--blau-cream);color:var(--blau-navy-deep);
+  font-size:14px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
+  box-shadow:0 14px 30px -12px rgba(12,36,69,.55);
+  transition:background-color .25s ease, transform .25s ease, box-shadow .25s ease;
 }
-.bulk-cta:hover{border-color:var(--blau-cream)}
+.bulk-cta:hover{
+  background:#FFFFFF;transform:translateY(-2px);
+  box-shadow:0 18px 36px -12px rgba(12,36,69,.6);
+}
 
 @media (max-width:820px){
   .bulk{--step:38vh}
@@ -347,7 +356,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--blau-cream);outline
     padding:calc(var(--header-h) + 56px) var(--gutter) 92px;
     align-content:center;gap:20px;
   }
-  .bulk-slide img{grid-column:1;grid-row:2;height:min(48vh,390px)}
+  .bulk-slide img{grid-column:1;grid-row:2;height:min(56vh,460px)}
   .bulk-name{grid-column:1;grid-row:1;justify-self:center;max-width:none}
   .bulk-note{display:none}
 }
@@ -777,8 +786,8 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--blau-cream);outline
       <button class="nav-trigger" type="button" data-label="Shop"
               aria-expanded="false" aria-controls="shop-panel">Shop</button>
       <div class="nav-panel" id="shop-panel" data-open="false">
-        <a href="#bulk">Coffee Bulk Order</a>
-        <a href="#kitchen">Open Kitchen</a>
+        <a href="#bulk" target="_blank" rel="noopener">Coffee Bulk Order</a>
+        <a href="#kitchen" target="_blank" rel="noopener">Open Kitchen</a>
       </div>
     </div>
     <a href="#whatson" data-label="What&rsquo;s On">What&rsquo;s On</a>
@@ -835,52 +844,21 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--blau-cream);outline
     <div class="bulk-pin">
       <div class="bulk-head">
         <h2 id="bulk-title">Coffee Bulk Order</h2>
-        <span class="bulk-count">01 / 08</span>
+        <div class="bulk-dots" aria-hidden="true"><span></span><span></span></div>
       </div>
 
-      <article class="bulk-slide" style="--ground:#732B2A;z-index:1" data-name="Americano">
-        <p class="bulk-name">Americano</p>
-        <img src="assets/bottles/americano.jpg" alt="BLAU Americano in a bulk bottle" loading="lazy">
-        <p class="bulk-note">Straight and cold. Nothing added.</p>
-      </article>
-      <article class="bulk-slide" style="--ground:#2E344E;z-index:2" data-name="Blau Signature">
+      <article class="bulk-slide" style="--ground:#2E344E;z-index:1" data-name="Blau Signature">
         <p class="bulk-name">Blau Signature</p>
         <img src="assets/bottles/blau-signature.jpg" alt="BLAU Blau Signature in a bulk bottle" loading="lazy">
         <p class="bulk-note">The house pour, bottled as it is served.</p>
       </article>
-      <article class="bulk-slide" style="--ground:#816750;z-index:3" data-name="Kopi Susu Bro">
+      <article class="bulk-slide" style="--ground:#816750;z-index:2" data-name="Kopi Susu Bro">
         <p class="bulk-name">Kopi Susu Bro</p>
         <img src="assets/bottles/kopi-susu-bro.jpg" alt="BLAU Kopi Susu Bro in a bulk bottle" loading="lazy">
         <p class="bulk-note">Palm sugar and milk. The everyday one.</p>
       </article>
-      <article class="bulk-slide" style="--ground:#5B3E33;z-index:4" data-name="Latte">
-        <p class="bulk-name">Latte</p>
-        <img src="assets/bottles/latte.jpg" alt="BLAU Latte in a bulk bottle" loading="lazy">
-        <p class="bulk-note">Espresso and milk, balanced for keeping cold.</p>
-      </article>
-      <article class="bulk-slide" style="--ground:#322724;z-index:5" data-name="Chocolate">
-        <p class="bulk-name">Chocolate</p>
-        <img src="assets/bottles/chocolate.jpg" alt="BLAU Chocolate in a bulk bottle" loading="lazy">
-        <p class="bulk-note">Dark and thick, not sweet.</p>
-      </article>
-      <article class="bulk-slide" style="--ground:#535E40;z-index:6" data-name="Matcha">
-        <p class="bulk-name">Matcha</p>
-        <img src="assets/bottles/matcha.jpg" alt="BLAU Matcha in a bulk bottle" loading="lazy">
-        <p class="bulk-note">Stone-ground, whisked to order.</p>
-      </article>
-      <article class="bulk-slide" style="--ground:#5F346A;z-index:7" data-name="Taro">
-        <p class="bulk-name">Taro</p>
-        <img src="assets/bottles/taro.jpg" alt="BLAU Taro in a bulk bottle" loading="lazy">
-        <p class="bulk-note">Creamy, mild, and quietly popular.</p>
-      </article>
-      <article class="bulk-slide" style="--ground:#A05530;z-index:8" data-name="Thai Tea">
-        <p class="bulk-name">Thai Tea</p>
-        <img src="assets/bottles/thai-tea.jpg" alt="BLAU Thai Tea in a bulk bottle" loading="lazy">
-        <p class="bulk-note">Strong brew, condensed milk, plenty of ice.</p>
-      </article>
 
       <div class="bulk-foot">
-        <div class="bulk-dots" aria-hidden="true"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
         <a class="bulk-cta" href="https://wa.me/6281999718181">Order by the crate</a>
       </div>
     </div>
@@ -958,18 +936,6 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--blau-cream);outline
     <h2 class="menu-band-title" id="menu-band-title">Menu</h2>
   </section>
 
-  <section class="loyalty" id="loyalty" aria-labelledby="loyalty-title">
-    <div class="loyalty-inner">
-      <h2 id="loyalty-title">Loyalty Card</h2>
-      <figure class="card-mock">
-        <video src="assets/loyalty/loyalty-card.mp4"
-               poster="assets/loyalty/loyalty-card-poster.jpg"
-               autoplay muted loop playsinline preload="metadata"
-               aria-label="BLAU loyalty card filling up with stamps"></video>
-      </figure>
-    </div>
-  </section>
-
   <!-- PLACEHOLDER CONTENT — dates and copy need replacing with real events -->
   <section class="whats-on" id="whatson" aria-labelledby="whatson-title">
     <div class="wo-inner">
@@ -1021,6 +987,18 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--blau-cream);outline
           </a>
         </li>
       </ul>
+    </div>
+  </section>
+
+  <section class="loyalty" id="loyalty" aria-labelledby="loyalty-title">
+    <div class="loyalty-inner">
+      <h2 id="loyalty-title">Loyalty Card</h2>
+      <figure class="card-mock">
+        <video src="assets/loyalty/loyalty-card.mp4"
+               poster="assets/loyalty/loyalty-card-poster.jpg"
+               autoplay muted loop playsinline preload="metadata"
+               aria-label="BLAU loyalty card filling up with stamps"></video>
+      </figure>
     </div>
   </section>
 </main>
@@ -1164,7 +1142,6 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--blau-cream);outline
   var track  = document.querySelector('.bulk');
   var slides = [].slice.call(document.querySelectorAll('.bulk-slide'));
   var dots   = [].slice.call(document.querySelectorAll('.bulk-dots span'));
-  var count  = document.querySelector('.bulk-count');
   if(!track || slides.length < 2) return;
 
   var last = -1, ticking = false;
@@ -1187,7 +1164,6 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--blau-cream);outline
     if(active !== last){
       last = active;
       for(var d = 0; d < dots.length; d++) dots[d].classList.toggle('on', d === active);
-      if(count) count.textContent = '0' + (active + 1) + ' / 0' + slides.length;
     }
   }
 
