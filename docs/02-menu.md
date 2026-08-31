@@ -1,8 +1,15 @@
-# BLAU — Menu 2025 (full transcription)
+# BLAU — Menu 2026 (full transcription)
 
-Source: `assets/BLAU-menu-2025.pdf` (12 pages, "MENU 2025_revisi 1").
+Source: `assets/BLAU-menu-2026.pdf` (12 pages, "MENU 2026"), supplied 2026-08-21 —
+supersedes the 2025 revision this file originally transcribed.
 Prices in IDR thousands as printed on the menu (`60k` = Rp 60.000).
-Page references map to `assets/menu-pages/pNNN.png`.
+Page references map to the 2025 render at `assets/menu-pages/pNNN.png` (layout is
+unchanged between revisions; only the two flagged rows below actually differ).
+
+**What changed from 2025 → 2026:** Grilled Oxtail rose from 137k to **165k**, and two
+items joined Rice Bowl — **Ayam Bakar Rempah** and **Ayam Goreng Kremes**, both 49k.
+Every other item and price across all nine categories is identical between the two PDFs.
+This transcription, and the live `site/menu.html` page, both reflect the 2026 figures.
 
 ---
 
@@ -20,7 +27,9 @@ Page references map to `assets/menu-pages/pNNN.png`.
 | Kana Moo Krob | 69k | Crispy pork stir fry with kaylan and a sunny side up |
 | Bagoge | 55k | Smashed crispy pork belly with sambal bawang and sunny side up |
 | Belly Bowl | 58k | Slow-cooked braised pork belly, stir-fried onions, sunny side up, warm rice |
-| Grilled Oxtail | 137k | Slow-cooked grilled marinated oxtail with spiced soup, emping, chili, lime, warm rice |
+| Grilled Oxtail | **165k** *(was 137k in 2025)* | Slow-cooked grilled marinated oxtail with spiced soup, emping, chili, lime, warm rice |
+| **Ayam Bakar Rempah** *(new)* | 49k | Grilled chicken marinated in Indonesian spices, served with warm rice and sambal bawang |
+| **Ayam Goreng Kremes** *(new)* | 49k | Crispy fried chicken topped with crunchy kremes crumbs, served with warm rice and sambal bawang |
 | Salted Egg Chicken | 58k | Creamy salted egg chicken with a sunny side up |
 | Sweet N Sour Chicken | 48k | Deep fried chicken, house-made sweet & sour sauce, warm rice, sunny side egg |
 | Salt & Pepper Pork | 52k | Crispy fried pork dusted with salt & peppercorn, rice, sunny side egg |
@@ -131,10 +140,14 @@ Page references map to `assets/menu-pages/pNNN.png`.
 
 ## Notes for the build
 
-- **75 items across 9 categories.** Big enough that the menu page needs category
-  jump-links / sticky tabs on mobile, not one long scroll.
-- **Multi-price items** (`49k/58k/65k`) are protein-choice variants. The web menu should render
-  these as a base item with selectable variants rather than a slash-separated string.
+- **78 items across 9 categories** (was 75 in the 2025 revision — see the two new Rice Bowl
+  items above). Big enough that the menu page needs category jump-links / sticky tabs on
+  mobile, not one long scroll. **Built:** `site/menu.html` does exactly this — a sticky
+  category tab bar that highlights the section in view, linked from the header's Menu item.
+- **Multi-price items** (`49k/58k/65k`) are protein-choice variants. Rendered on the web menu
+  as a base item with the price list shown inline (`49k / 58k / 65k`) next to the item name,
+  rather than as selectable variants — no ordering happens on the page itself, so a picker
+  wasn't worth the complexity.
 - **Photographed items** (good candidates for a "Signatures" module on the homepage):
   Nasi Goreng Bali, Nasi Goreng Special, Nasgor Kampung, Nasi Goreng Katsu, Grilled Oxtail,
   Salted Egg Chicken, Sweet N Sour Chicken, Salt & Pepper Pork, Aglio Oglio, Wild Mushroom
@@ -142,4 +155,5 @@ Page references map to `assets/menu-pages/pNNN.png`.
   Affogato, Speculoos/Butterscotch/Banana Oat Latte, Honey Lemonade, Thai Tea, Artisan Tea, Juices.
 - **Not photographed** (would need shots, or design around their absence): all pasta except
   aglio oglio, three of four pizzas, most rice bowls on p3, Blau Salad, most coffee list items.
-- Prices are as printed in the 2025 revision — **confirm they are still current before launch.**
+  `site/menu.html` is text-only by design — no photos are used there, so this gap doesn't block it.
+- Prices confirmed current as of the 2026 revision supplied 2026-08-21.
