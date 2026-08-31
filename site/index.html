@@ -89,7 +89,7 @@ a{color:inherit;text-decoration:none}
 /* Hover sweeps a cream ground in from the left and flips the text to navy.
    Done with background-size rather than a pseudo-element so there is no
    stacking context to fight. */
-.nav > a, .nav-trigger{
+.nav > a{
   position:relative;overflow:hidden;
   display:grid;place-items:center;
   font-size:15px;font-weight:400;letter-spacing:.01em;line-height:1;
@@ -98,7 +98,7 @@ a{color:inherit;text-decoration:none}
 /* A cream panel carrying a navy copy of the same label, wiped in from the
    left. Because the copy sits inside the panel, the letters invert exactly
    as the edge passes over them rather than all flipping at once. */
-.nav > a::before, .nav-trigger::before{
+.nav > a::before{
   content:attr(data-label);
   position:absolute;inset:0;
   display:grid;place-items:center;
@@ -106,8 +106,7 @@ a{color:inherit;text-decoration:none}
   clip-path:inset(0 100% 0 0);
   transition:clip-path .42s cubic-bezier(.4,0,.2,1);
 }
-.nav > a:hover::before,.nav > a:focus-visible::before,
-.nav-shop:hover .nav-trigger::before,.nav-trigger:focus-visible::before{clip-path:inset(0 0 0 0)}
+.nav > a:hover::before,.nav > a:focus-visible::before{clip-path:inset(0 0 0 0)}
 
 .nav > a.cta{font-weight:600;letter-spacing:.06em;text-transform:uppercase;font-size:14px}
 /* resting underline on the CTA, flipped to navy once the panel covers it */
@@ -118,33 +117,8 @@ a{color:inherit;text-decoration:none}
 }
 .nav > a.cta:hover::after{background:var(--blau-navy-deep)}
 
-/* Shop — one entry covering both take-home sections */
-.nav-shop{position:relative;display:flex;align-items:center}
-.nav-trigger{
-  font-family:inherit;background:none;border:0;cursor:pointer;
-  font-size:15px;font-weight:400;letter-spacing:.01em;line-height:1;
-}
-.nav-panel{
-  position:absolute;top:calc(100% + 6px);left:0;z-index:5;
-  min-width:210px;padding:6px;
-  background:var(--blau-cream);
-  box-shadow:0 14px 34px -14px rgba(12,36,69,.55);
-  display:grid;
-  opacity:0;visibility:hidden;transform:translateY(-6px);
-  transition:opacity .24s ease, transform .24s ease, visibility .24s;
-}
-.nav-shop:hover .nav-panel,
-.nav-shop:focus-within .nav-panel,
-.nav-panel[data-open="true"]{opacity:1;visibility:visible;transform:none}
-.nav-panel a{
-  display:block;padding:11px 14px;white-space:nowrap;
-  font-size:14px;font-weight:400;color:var(--blau-navy-deep);
-  transition:background-color .2s ease;
-}
-.nav-panel a:hover,.nav-panel a:focus-visible{background:rgba(19,58,107,.1)}
-
 @media (prefers-reduced-motion:reduce){
-  .nav > a::before,.nav-trigger::before{transition-duration:.15s}
+  .nav > a::before{transition-duration:.15s}
 }
 
 a:focus-visible,button:focus-visible{outline:2px solid var(--blau-cream);outline-offset:6px}
@@ -173,7 +147,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--blau-cream);outline
 /* mobile: collapse the middle links, keep the CTA, reveal the toggle.
    Must come after the .nav-toggle base rule or display:none wins. */
 @media (max-width:900px){
-  .nav > a:not(.cta),.nav-shop{display:none}
+  .nav > a:not(.cta){display:none}
   .nav-toggle{display:inline-flex}
 }
 
@@ -319,6 +293,15 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--blau-cream);outline
   font-size:clamp(13px,1.15vw,15px);font-weight:600;
   letter-spacing:.16em;text-transform:uppercase;color:var(--blau-cream);
 }
+.bulk-head-right{display:flex;align-items:center;gap:18px}
+.bulk-all{
+  pointer-events:auto;
+  font-size:12px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--blau-cream);padding-bottom:3px;
+  border-bottom:1px solid rgba(247,243,235,.5);
+  transition:border-color .25s ease;
+}
+.bulk-all:hover{border-color:var(--blau-cream)}
 .bulk-dots{display:flex;gap:7px}
 .bulk-dots span{
   width:7px;height:7px;border-radius:50%;
@@ -472,17 +455,22 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--blau-cream);outline
    playing even when the OS asks for reduced motion. Deliberate: it is slow,
    decorative, and carries no information the visitor has to track. */
 
+/* This is now a real link through to the full menu page, so it takes
+   pointer events (the marquee behind it stays decorative either way)
+   and gets a visible hover/focus cue to read as clickable. */
 .menu-band-title{
   position:absolute;left:0;right:0;top:50%;
   transform:translateY(-50%);
   margin:0;padding:0 var(--gutter);
-  z-index:2;pointer-events:none;text-align:center;
+  z-index:2;text-align:center;display:block;
   font-size:clamp(32px,8vw,116px);
   font-weight:700;line-height:.88;letter-spacing:-.025em;
   text-transform:uppercase;
   color:var(--blau-cream);
   text-shadow:0 6px 48px rgba(12,36,69,.62);
+  transition:opacity .25s ease;
 }
+.menu-band-title:hover,.menu-band-title:focus-visible{opacity:.82}
 
 /* On a narrow screen only one or two photos are visible at a time, so the
    staggered collage leaves big empty patches of ground that read as a gap.
@@ -781,30 +769,18 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--blau-cream);outline
   </div>
 
   <nav class="nav" aria-label="Primary">
-    <a href="#menu" data-label="Menu">Menu</a>
-    <div class="nav-shop">
-      <button class="nav-trigger" type="button" data-label="Shop"
-              aria-expanded="false" aria-controls="shop-panel">Shop</button>
-      <div class="nav-panel" id="shop-panel" data-open="false">
-        <a href="#bulk" target="_blank" rel="noopener">Coffee Bulk Order</a>
-        <a href="#kitchen" target="_blank" rel="noopener">Open Kitchen</a>
-      </div>
-    </div>
+    <a href="menu.html" data-label="Menu">Menu</a>
+    <a href="shop.html" data-label="Shop">Shop</a>
     <a href="#whatson" data-label="What&rsquo;s On">What&rsquo;s On</a>
-    <a href="#about" data-label="About">About</a>
-    <a href="#visit" data-label="Visit">Visit</a>
     <a class="cta" href="https://wa.me/6281999718181" data-label="Book Now">Book Now</a>
   </nav>
 </header>
 
 <div class="drawer" id="drawer" data-open="false">
   <nav class="drawer-nav" aria-label="Mobile">
-    <a href="#menu">Menu</a>
-    <a href="#bulk">Coffee Bulk Order</a>
-    <a href="#kitchen">Open Kitchen</a>
+    <a href="menu.html">Menu</a>
+    <a href="shop.html">Shop</a>
     <a href="#whatson">What&rsquo;s On</a>
-    <a href="#about">About</a>
-    <a href="#visit">Visit</a>
     <a href="https://wa.me/6281999718181">Book Now</a>
   </nav>
   <div class="drawer-social">
@@ -844,7 +820,10 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--blau-cream);outline
     <div class="bulk-pin">
       <div class="bulk-head">
         <h2 id="bulk-title">Coffee Bulk Order</h2>
-        <div class="bulk-dots" aria-hidden="true"><span></span><span></span></div>
+        <div class="bulk-head-right">
+          <a class="bulk-all" href="shop.html">All Flavours</a>
+          <div class="bulk-dots" aria-hidden="true"><span></span><span></span></div>
+        </div>
       </div>
 
       <article class="bulk-slide" style="--ground:#2E344E;z-index:1" data-name="Blau Signature">
@@ -933,7 +912,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--blau-cream);outline
         </ul>
       </div>
     </div>
-    <h2 class="menu-band-title" id="menu-band-title">Menu</h2>
+    <a class="menu-band-title" id="menu-band-title" href="menu.html">Menu</a>
   </section>
 
   <!-- PLACEHOLDER CONTENT — dates and copy need replacing with real events -->
@@ -1025,7 +1004,8 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--blau-cream);outline
         <li><a href="https://wa.me/6281999718181">WhatsApp</a></li>
         <li><a href="https://gofood.co.id/en/jakarta/restaurant/blau-eatery-coffee-41353093-a30a-4326-bda5-1f50cb8c7658">GoFood</a></li>
         <li><a href="#">GrabFood</a></li>
-        <li><a href="#menu">Menu</a></li>
+        <li><a href="menu.html">Menu</a></li>
+        <li><a href="shop.html">Shop</a></li>
       </ul>
     </nav>
 
@@ -1106,33 +1086,6 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--blau-cream);outline
   new IntersectionObserver(function(entries){
     header.classList.toggle('is-solid', !entries[0].isIntersecting);
   }, { rootMargin: '-' + headerH + 'px 0px 0px 0px', threshold: 0 }).observe(hero);
-})();
-
-/* Shop dropdown — CSS handles hover and focus-within; this adds a click
-   toggle so it also works on touch, where there is no hover. */
-(function(){
-  var shop = document.querySelector('.nav-shop');
-  var btn  = shop && shop.querySelector('.nav-trigger');
-  var panel= shop && shop.querySelector('.nav-panel');
-  if(!shop || !btn || !panel) return;
-
-  function setOpen(open){
-    panel.dataset.open = open ? 'true' : 'false';
-    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-  }
-  btn.addEventListener('click', function(e){
-    e.stopPropagation();
-    setOpen(panel.dataset.open !== 'true');
-  });
-  panel.addEventListener('click', function(e){
-    if(e.target.tagName === 'A') setOpen(false);
-  });
-  document.addEventListener('click', function(e){
-    if(!shop.contains(e.target)) setOpen(false);
-  });
-  document.addEventListener('keydown', function(e){
-    if(e.key === 'Escape' && panel.dataset.open === 'true'){ setOpen(false); btn.focus(); }
-  });
 })();
 
 /* Coffee Bulk Order — scroll through the pinned stage drives a wipe.

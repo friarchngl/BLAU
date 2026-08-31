@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Menu — BLAU Eatery &amp; Coffee</title>
+<meta name="description" content="The full BLAU menu — rice bowls, pasta, pizza, appetizers, kids meal, coffee, refreshments and juice. Kelapa Gading, Jakarta.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
+
+<style>
+/* ============================================================
+   BLAU — design tokens (kept identical to index.html)
+   ============================================================ */
+:root{
+  --blau-navy:     #133A6B;
+  --blau-cream:    #F7F3EB;
+  --blau-navy-deep:#0C2445;
+  --blau-navy-mid: #1D4E86;
+
+  --hero-text:     var(--blau-cream);
+  --hero-dim:      rgba(247,243,235,.82);
+  --hero-rule:     rgba(247,243,235,.28);
+
+  --font: "Poppins", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --gutter: clamp(20px, 4vw, 52px);
+  --header-h: 72px;
+  --tabs-h: 54px;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family:var(--font);
+  background:var(--blau-cream);
+  color:var(--blau-navy);
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+img{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+
+.skip{
+  position:absolute;left:-9999px;top:0;z-index:100;
+  background:var(--blau-cream);color:var(--blau-navy-deep);
+  padding:12px 18px;font-size:14px;font-weight:500;
+}
+.skip:focus{left:var(--gutter);top:12px}
+
+/* ============================================================
+   HEADER — same component as the homepage. This page has no hero
+   to blend into, so it starts (and stays) solid.
+   ============================================================ */
+.site-header{
+  position:fixed;inset:0 0 auto 0;z-index:20;
+  height:var(--header-h);
+  display:flex;align-items:center;justify-content:space-between;
+  gap:24px;padding:0 var(--gutter);
+  background:var(--blau-navy-deep);
+  box-shadow:0 1px 0 rgba(247,243,235,.12);
+}
+
+.header-left{display:flex;align-items:center;gap:clamp(10px,3vw,16px)}
+.brand{display:flex;align-items:center;height:100%}
+.brand img{height:19px;width:auto}
+@media (max-width:640px){.brand img{height:16px}}
+
+.nav{display:flex;align-items:center;gap:clamp(4px,1.1vw,14px)}
+.nav > a{
+  position:relative;overflow:hidden;
+  display:grid;place-items:center;
+  font-size:15px;font-weight:400;letter-spacing:.01em;line-height:1;
+  padding:9px 12px;color:var(--hero-text);
+}
+.nav > a::before{
+  content:attr(data-label);
+  position:absolute;inset:0;
+  display:grid;place-items:center;
+  background:var(--blau-cream);color:var(--blau-navy-deep);
+  clip-path:inset(0 100% 0 0);
+  transition:clip-path .42s cubic-bezier(.4,0,.2,1);
+}
+.nav > a:hover::before,.nav > a:focus-visible::before{clip-path:inset(0 0 0 0)}
+
+/* current-page cue — same underline language as the CTA uses at rest */
+.nav > a[aria-current="page"]{font-weight:600}
+.nav > a[aria-current="page"]::after{
+  content:"";position:absolute;left:12px;right:12px;bottom:6px;
+  height:1px;background:var(--blau-cream);
+}
+
+.nav > a.cta{font-weight:600;letter-spacing:.06em;text-transform:uppercase;font-size:14px}
+.nav > a.cta::after{
+  content:"";position:absolute;left:12px;right:12px;bottom:5px;
+  height:1px;background:var(--blau-cream);
+  transition:background-color .3s ease .12s;
+}
+.nav > a.cta:hover::after{background:var(--blau-navy-deep)}
+
+@media (prefers-reduced-motion:reduce){
+  .nav > a::before{transition-duration:.15s}
+}
+
+a:focus-visible,button:focus-visible{outline:2px solid var(--blau-cream);outline-offset:6px}
+
+.nav-toggle{
+  display:none;align-items:center;justify-content:center;
+  width:38px;height:38px;padding:0;flex:none;
+  background:none;cursor:pointer;color:var(--hero-text);
+  border:1px solid rgba(247,243,235,.4);
+}
+.nav-toggle span{
+  display:block;width:18px;height:1px;background:currentColor;position:relative;
+  transition:background-color .2s ease;
+}
+.nav-toggle span::before,.nav-toggle span::after{
+  content:"";position:absolute;left:0;width:18px;height:1px;background:currentColor;
+  transition:transform .3s cubic-bezier(.4,0,.2,1), top .3s cubic-bezier(.4,0,.2,1);
+}
+.nav-toggle span::before{top:-6px}
+.nav-toggle span::after{top:6px}
+.nav-toggle[aria-expanded="true"] span{background:transparent}
+.nav-toggle[aria-expanded="true"] span::before{top:0;transform:rotate(45deg)}
+.nav-toggle[aria-expanded="true"] span::after{top:0;transform:rotate(-45deg)}
+
+@media (max-width:900px){
+  .nav > a:not(.cta){display:none}
+  .nav-toggle{display:inline-flex}
+}
+
+.drawer{
+  position:fixed;inset:var(--header-h) 0 0 0;z-index:19;
+  background:var(--blau-navy-deep);
+  display:flex;flex-direction:column;
+  overflow-y:auto;overscroll-behavior:contain;
+  opacity:0;pointer-events:none;transform:translateY(-8px);
+  transition:opacity .3s ease, transform .3s ease;
+}
+.drawer[data-open="true"]{opacity:1;transform:none;pointer-events:auto}
+
+.drawer-nav{display:flex;flex-direction:column}
+.drawer-nav a{
+  display:grid;place-items:center;text-align:center;
+  padding:clamp(20px,4.6vh,36px) 20px;
+  border-bottom:1px solid rgba(247,243,235,.16);
+  font-size:clamp(21px,6.2vw,30px);font-weight:400;line-height:1.1;
+  color:var(--blau-cream);
+}
+.drawer-social{
+  display:flex;justify-content:center;align-items:center;gap:34px;
+  padding:24px 20px;border-bottom:1px solid rgba(247,243,235,.16);
+}
+.drawer-social a{display:grid;place-items:center;color:var(--blau-cream)}
+.drawer-social svg{width:21px;height:21px}
+.drawer-close{
+  width:100%;padding:22px 20px;
+  background:none;border:0;cursor:pointer;
+  font-family:inherit;font-size:15px;font-weight:500;letter-spacing:.08em;
+  color:rgba(247,243,235,.78);
+}
+.drawer-close:hover{color:var(--blau-cream)}
+
+@media (min-width:901px){.drawer{display:none}}
+
+/* ============================================================
+   MENU PAGE — masthead, sticky category tabs, category lists
+   ============================================================ */
+.menu-hero{
+  padding:calc(var(--header-h) + 48px) var(--gutter) 44px;
+  max-width:1100px;margin:0 auto;
+  text-align:center;
+}
+.menu-hero h1{
+  margin:0;
+  font-size:clamp(40px,7vw,84px);font-weight:700;line-height:.94;letter-spacing:-.025em;
+  text-transform:uppercase;color:var(--blau-navy);
+}
+
+.mtabs-wrap{
+  position:sticky;top:var(--header-h);z-index:15;
+  background:var(--blau-cream);
+  border-top:1px solid rgba(19,58,107,.14);
+  border-bottom:1px solid rgba(19,58,107,.14);
+}
+.mtabs{
+  max-width:1100px;margin:0 auto;padding:0 var(--gutter);
+  display:flex;gap:4px;overflow-x:auto;
+  scrollbar-width:none;-ms-overflow-style:none;
+}
+.mtabs::-webkit-scrollbar{display:none}
+.mtabs a{
+  flex:none;padding:16px 14px;
+  font-size:12px;font-weight:600;letter-spacing:.07em;text-transform:uppercase;
+  color:rgba(19,58,107,.5);
+  border-bottom:2px solid transparent;
+  transition:color .2s ease,border-color .2s ease;
+}
+.mtabs a:hover{color:var(--blau-navy)}
+.mtabs a.is-active{color:var(--blau-navy);border-bottom-color:var(--blau-navy)}
+
+.menu-body{max-width:1100px;margin:0 auto;padding:0 var(--gutter)}
+
+.mcat{
+  padding:56px 0 12px;
+  border-top:1px solid rgba(19,58,107,.14);
+  scroll-margin-top:calc(var(--header-h) + var(--tabs-h) + 14px);
+}
+.mcat:first-of-type{border-top:0}
+.mcat-head{
+  display:flex;align-items:baseline;justify-content:space-between;gap:16px;
+  margin-bottom:30px;
+}
+.mcat h2{
+  margin:0;
+  font-size:clamp(30px,4.6vw,50px);font-weight:700;letter-spacing:-.02em;
+  text-transform:uppercase;color:var(--blau-navy);
+}
+.mcat-count{
+  font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+  color:rgba(19,58,107,.45);white-space:nowrap;
+}
+
+.mlist{
+  list-style:none;margin:0 0 8px;padding:0;
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+  column-gap:56px;
+}
+@media (max-width:700px){.mlist{grid-template-columns:1fr}}
+
+.mi{padding:17px 0;border-bottom:1px solid rgba(19,58,107,.12)}
+.mi-row{display:flex;align-items:baseline;justify-content:space-between;gap:14px}
+.mi-row h3{
+  margin:0;font-size:16px;font-weight:600;line-height:1.3;color:var(--blau-navy);
+}
+.mi-price{
+  font-size:14px;font-weight:600;color:var(--blau-navy);
+  font-variant-numeric:tabular-nums;white-space:nowrap;
+}
+.mi p{
+  margin:5px 0 0;max-width:52ch;
+  font-size:13.5px;font-weight:300;line-height:1.55;color:rgba(19,58,107,.66);
+}
+
+/* order-in band, sits between the last category and the footer */
+.menu-cta{
+  margin-top:8px;padding:clamp(40px,6vw,64px) 0 clamp(56px,7vw,84px);
+  text-align:center;
+}
+.menu-cta p{
+  margin:0 0 18px;font-size:14px;font-weight:300;color:rgba(19,58,107,.7);
+}
+.menu-cta-links{display:flex;justify-content:center;gap:12px;flex-wrap:wrap}
+.menu-cta a{
+  padding:13px 26px;border-radius:999px;
+  border:1.5px solid var(--blau-navy);
+  font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+  transition:background-color .25s ease,color .25s ease;
+}
+.menu-cta a.solid{background:var(--blau-navy);color:var(--blau-cream)}
+.menu-cta a.solid:hover{background:var(--blau-navy-deep);border-color:var(--blau-navy-deep)}
+.menu-cta a:not(.solid):hover{background:var(--blau-navy);color:var(--blau-cream)}
+
+/* ============================================================
+   FOOTER — identical component to the homepage
+   ============================================================ */
+.site-footer{background:var(--blau-cream);color:var(--blau-navy)}
+.footer-main{
+  max-width:1280px;margin:0 auto;
+  padding:clamp(40px,5vw,62px) var(--gutter);
+  display:grid;
+  grid-template-columns:auto repeat(3,minmax(0,1fr)) minmax(260px,320px);
+  gap:clamp(28px,3.2vw,48px);
+  align-items:start;
+}
+.f-brand img{width:clamp(96px,11vw,140px);height:auto}
+.f-col h3{
+  margin:0 0 16px;
+  font-size:13px;font-weight:600;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--blau-navy);
+}
+.f-col ul{list-style:none;margin:0;padding:0;display:grid;gap:11px}
+.f-col a,.f-col span{
+  font-size:15px;font-weight:300;line-height:1.35;
+  color:rgba(19,58,107,.82);
+}
+.f-col a{position:relative;transition:color .25s ease}
+.f-col a:hover{color:var(--blau-navy)}
+.f-col ul.f-icons{
+  display:flex;flex-direction:row;flex-wrap:wrap;
+  gap:12px;margin:0;padding:0;list-style:none;
+}
+.f-icons a{
+  display:grid;place-items:center;width:44px;height:44px;
+  border:1px solid rgba(19,58,107,.35);border-radius:50%;
+  color:var(--blau-navy);
+  transition:background-color .25s ease,color .25s ease,border-color .25s ease;
+}
+.f-icons a:hover{background:var(--blau-navy);color:var(--blau-cream);border-color:var(--blau-navy)}
+.f-icons svg{width:19px;height:19px;display:block}
+.f-cta{
+  border-left:1px solid rgba(19,58,107,.18);
+  padding-left:clamp(24px,2.6vw,40px);
+  display:grid;gap:14px;align-content:start;
+}
+.f-btn{
+  display:block;text-align:center;
+  padding:15px 20px;border-radius:999px;
+  font-size:14px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+  border:1.5px solid var(--blau-navy);
+  transition:background-color .28s ease,color .28s ease;
+}
+.f-btn.solid{background:var(--blau-navy);color:var(--blau-cream)}
+.f-btn.solid:hover{background:var(--blau-navy-deep);border-color:var(--blau-navy-deep)}
+.f-btn.ghost{background:transparent;color:var(--blau-navy)}
+.f-btn.ghost:hover{background:var(--blau-navy);color:var(--blau-cream)}
+.footer-bottom{border-top:1px solid rgba(19,58,107,.18)}
+.footer-bottom-in{
+  max-width:1280px;margin:0 auto;
+  padding:18px var(--gutter);
+  display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;
+  gap:10px 28px;
+  font-size:13px;font-weight:300;color:rgba(19,58,107,.66);
+}
+.footer-bottom-in nav{display:flex;flex-wrap:wrap;gap:10px 26px}
+.footer-bottom-in a{transition:color .25s ease}
+.footer-bottom-in a:hover{color:var(--blau-navy)}
+
+@media (max-width:1080px){
+  .footer-main{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .f-brand{grid-column:1/-1}
+  .f-cta{
+    grid-column:1/-1;
+    border-left:0;padding-left:0;
+    padding-top:26px;border-top:1px solid rgba(19,58,107,.18);
+  }
+}
+@media (max-width:620px){
+  .footer-main{grid-template-columns:1fr 1fr}
+  .f-socials{grid-column:1/-1}
+  .f-icons{flex-direction:row}
+}
+</style>
+</head>
+<body>
+
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site-header">
+  <div class="header-left">
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="drawer" aria-label="Open menu">
+      <span></span>
+    </button>
+    <a class="brand" href="index.html" aria-label="BLAU — home">
+      <img src="assets/brand/blau-cream.png" alt="BLAU">
+    </a>
+  </div>
+
+  <nav class="nav" aria-label="Primary">
+    <a href="menu.html" data-label="Menu" aria-current="page">Menu</a>
+    <a href="shop.html" data-label="Shop">Shop</a>
+    <a href="index.html#whatson" data-label="What&rsquo;s On">What&rsquo;s On</a>
+    <a class="cta" href="https://wa.me/6281999718181" data-label="Book Now">Book Now</a>
+  </nav>
+</header>
+
+<div class="drawer" id="drawer" data-open="false">
+  <nav class="drawer-nav" aria-label="Mobile">
+    <a href="menu.html">Menu</a>
+    <a href="shop.html">Shop</a>
+    <a href="index.html#whatson">What&rsquo;s On</a>
+    <a href="https://wa.me/6281999718181">Book Now</a>
+  </nav>
+  <div class="drawer-social">
+    <a href="https://www.instagram.com/blau.id/" aria-label="BLAU on Instagram">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+        <rect x="3" y="3" width="18" height="18" rx="5"/>
+        <circle cx="12" cy="12" r="4"/>
+        <circle cx="17.3" cy="6.7" r="1.15" fill="currentColor" stroke="none"/>
+      </svg>
+    </a>
+    <a href="https://www.facebook.com/blau.eatery/" aria-label="BLAU on Facebook">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M13.5 21v-8h2.7l.4-3.1h-3.1V7.9c0-.9.25-1.5 1.55-1.5h1.65V3.6c-.29-.04-1.27-.13-2.4-.13-2.38 0-4 1.45-4 4.11V9.9H7.6V13h2.7v8h3.2z"/>
+      </svg>
+    </a>
+  </div>
+  <button class="drawer-close" type="button">Close</button>
+</div>
+
+<main id="main">
+
+  <section class="menu-hero">
+    <h1>Menu</h1>
+  </section>
+
+  <div class="mtabs-wrap">
+    <nav class="mtabs" id="mtabs" aria-label="Menu sections">
+      <a href="#rice-bowl">Rice Bowl</a>
+      <a href="#pasta">Pasta</a>
+      <a href="#pizza">Pizza</a>
+      <a href="#appetizer">Appetizer</a>
+      <a href="#kids-meal">Kids Meal</a>
+      <a href="#coffee">Coffee</a>
+      <a href="#refreshments">Refreshments</a>
+      <a href="#non-coffee">Non Coffee</a>
+      <a href="#juice">Juice</a>
+    </nav>
+  </div>
+
+  <div class="menu-body">
+
+    <section class="mcat" id="rice-bowl" aria-labelledby="rice-bowl-h">
+      <div class="mcat-head"><h2 id="rice-bowl-h">Rice Bowl</h2><span class="mcat-count">16 items</span></div>
+      <ul class="mlist">
+        <li class="mi"><div class="mi-row"><h3>Nasi Goreng Bali</h3><span class="mi-price">60k</span></div><p>Special Bali fried rice cooked with house-made sambal matah, with 2 marinated chicken skewers.</p></li>
+        <li class="mi"><div class="mi-row"><h3>Nasi Goreng Special (Bacon / Lapciong / Sate)</h3><span class="mi-price">49k / 58k / 65k</span></div><p>Fried rice with egg and your choice of beef bacon, lapciong, or sate maranggi (2 pcs).</p></li>
+        <li class="mi"><div class="mi-row"><h3>Nasgor Kampung + Telor</h3><span class="mi-price">38k</span></div><p>Fried rice with a sunny side egg.</p></li>
+        <li class="mi"><div class="mi-row"><h3>Nasi Goreng Katsu</h3><span class="mi-price">58k</span></div><p>Fried rice with egg and chicken katsu on top.</p></li>
+        <li class="mi"><div class="mi-row"><h3>Izakaya Saikoro Beef</h3><span class="mi-price">70k</span></div><p>Juicy Australian saikoro beef, stir-fried in a vibrant izakaya soy base with shimeji mushrooms, creamy scrambled eggs, and warm rice.</p></li>
+        <li class="mi"><div class="mi-row"><h3>Sambal Matah (Chicken / Pork)</h3><span class="mi-price">55k / 62k</span></div><p>Topped with fresh Balinese traditional sambal matah, a sunny side up on the side, and warm rice.</p></li>
+        <li class="mi"><div class="mi-row"><h3>Katsudon</h3><span class="mi-price">45k</span></div><p>Deep-fried marinated Japanese chicken katsu with our house-made tonkatsu sauce, mayonnaise, creamy scrambled egg and warm rice.</p></li>
+        <li class="mi"><div class="mi-row"><h3>Kana Moo Krob</h3><span class="mi-price">69k</span></div><p>Crispy pork stir-fry with kaylan and a sunny side up.</p></li>
+        <li class="mi"><div class="mi-row"><h3>Bagoge</h3><span class="mi-price">55k</span></div><p>Smashed crispy pork belly with sambal bawang and a sunny side up.</p></li>
+        <li class="mi"><div class="mi-row"><h3>Belly Bowl</h3><span class="mi-price">58k</span></div><p>Slow-cooked braised pork belly, stir-fried onions, sunny side up, and warm rice.</p></li>
+        <li class="mi"><div class="mi-row"><h3>Grilled Oxtail</h3><span class="mi-price">165k</span></div><p>Slow-cooked and grilled marinated oxtail served with a soup full of traditional spices, along with emping, chili, lime, and warm rice on the side.</p></li>
+        <li class="mi"><div class="mi-row"><h3>Ayam Bakar Rempah</h3><span class="mi-price">49k</span></div><p>Grilled chicken marinated in Indonesian spices, served with warm rice and sambal bawang.</p></li>
+        <li class="mi"><div class="mi-row"><h3>Ayam Goreng Kremes</h3><span class="mi-price">49k</span></div><p>Crispy fried chicken topped with crunchy kremes crumbs, served with warm rice and sambal bawang.</p></li>
+        <li class="mi"><div class="mi-row"><h3>Salted Egg Chicken</h3><span class="mi-price">58k</span></div><p>Creamy salted egg chicken with a sunny side up.</p></li>
+        <li class="mi"><div class="mi-row"><h3>Sweet N Sour Chicken</h3><span class="mi-price">48k</span></div><p>Deep-fried chicken with our house-made sweet &amp; sour sauce, warm rice, and a sunny side egg.</p></li>
+        <li class="mi"><div class="mi-row"><h3>Salt &amp; Pepper Pork</h3><span class="mi-price">52k</span></div><p>Crispy fried pork dusted with salt &amp; peppercorn, rice, and a sunny side egg.</p></li>
+      </ul>
+    </section>
+
+    <section class="mcat" id="pasta" aria-labelledby="pasta-h">
+      <div class="mcat-head"><h2 id="pasta-h">Pasta</h2><span class="mcat-count">4 items</span></div>
+      <ul class="mlist">
+        <li class="mi"><div class="mi-row"><h3>Aglio Oglio (Smoked Beef / Pork)</h3><span class="mi-price">70k / 80k</span></div><p>Linguine with BLAU's homemade garlic base, roasted mushroom, roasted cherry tomatoes, your choice of meat, topped with parmesan.</p></li>
+        <li class="mi"><div class="mi-row"><h3>Creamy Carbonara (Smoked Beef / Australian Beef / Pork)</h3><span class="mi-price">75k / 86k / 86k</span></div><p>Linguine cooked in BLAU's cream base with your choice of meat, roasted mushroom, soft sous-vide egg, and parmesan on top.</p></li>
+        <li class="mi"><div class="mi-row"><h3>Balinese Pasta</h3><span class="mi-price">84k</span></div><p>Stir-fry pasta with crispy pork belly, roasted mushrooms, roasted cherry tomato, and house-made sambal matah.</p></li>
+        <li class="mi"><div class="mi-row"><h3>Flamin' Alfredo (Smoked Beef / Pork)</h3><span class="mi-price">71k / 81k</span></div><p>Creamy and spicy Alfredo linguine with your choice of smoked beef or pork.</p></li>
+      </ul>
+    </section>
+
+    <section class="mcat" id="pizza" aria-labelledby="pizza-h">
+      <div class="mcat-head"><h2 id="pizza-h">Pizza</h2><span class="mcat-count">4 items</span></div>
+      <ul class="mlist">
+        <li class="mi"><div class="mi-row"><h3>Wild Mushroom</h3><span class="mi-price">108k</span></div><p>Earthy wild mushrooms on a creamy savoury base.</p></li>
+        <li class="mi"><div class="mi-row"><h3>Beef &amp; Mushroom</h3><span class="mi-price">105k</span></div><p>Juicy beef and tender mushrooms layered with melted cheese.</p></li>
+        <li class="mi"><div class="mi-row"><h3>Pepperoni</h3><span class="mi-price">98k</span></div><p>Crispy pepperoni and gooey mozzarella on a baked crust.</p></li>
+        <li class="mi"><div class="mi-row"><h3>Margheritta</h3><span class="mi-price">80k</span></div><p>A timeless blend of fresh tomato sauce and mozzarella.</p></li>
+      </ul>
+    </section>
+
+    <section class="mcat" id="appetizer" aria-labelledby="appetizer-h">
+      <div class="mcat-head"><h2 id="appetizer-h">Appetizer</h2><span class="mcat-count">9 items</span></div>
+      <ul class="mlist">
+        <li class="mi"><div class="mi-row"><h3>Blau Salad</h3><span class="mi-price">68k</span></div><p>Fresh romaine lettuce with grilled marinated chicken and roasted mushrooms, topped with vinaigrette mayo dressing.</p></li>
+        <li class="mi"><div class="mi-row"><h3>Original / Loaded Fries</h3><span class="mi-price">35k / 40k</span></div></li>
+        <li class="mi"><div class="mi-row"><h3>Fried Cassava</h3><span class="mi-price">40k</span></div></li>
+        <li class="mi"><div class="mi-row"><h3>Banana Fritters</h3><span class="mi-price">40k</span></div></li>
+        <li class="mi"><div class="mi-row"><h3>Cheesy Bite Nachos</h3><span class="mi-price">38k</span></div></li>
+        <li class="mi"><div class="mi-row"><h3>Mantau</h3><span class="mi-price">35k</span></div><p>Served with dipping sauce.</p></li>
+        <li class="mi"><div class="mi-row"><h3>Chicken Karage Original</h3><span class="mi-price">25k</span></div></li>
+        <li class="mi"><div class="mi-row"><h3>Gochujang Chicken</h3><span class="mi-price">29k</span></div></li>
+        <li class="mi"><div class="mi-row"><h3>Saikoro Maranggi (4 pcs)</h3><span class="mi-price">75k</span></div></li>
+      </ul>
+    </section>
+
+    <section class="mcat" id="kids-meal" aria-labelledby="kids-meal-h">
+      <div class="mcat-head"><h2 id="kids-meal-h">Kids Meal</h2><span class="mcat-count">2 items</span></div>
+      <ul class="mlist">
+        <li class="mi"><div class="mi-row"><h3>Nasi Telor Smoked Beef</h3><span class="mi-price">35k</span></div><p>Rice, scrambled egg and smoked beef, mayo and tomato sauce on the side.</p></li>
+        <li class="mi"><div class="mi-row"><h3>Katsu with Rice / Fries</h3><span class="mi-price">35k</span></div><p>Chicken katsu, mayo and tomato sauce on the side.</p></li>
+      </ul>
+    </section>
+
+    <section class="mcat" id="coffee" aria-labelledby="coffee-h">
+      <div class="mcat-head"><h2 id="coffee-h">Coffee</h2><span class="mcat-count">17 items</span></div>
+      <ul class="mlist">
+        <li class="mi"><div class="mi-row"><h3>Black Coffee</h3><span class="mi-price">26k</span></div></li>
+        <li class="mi"><div class="mi-row"><h3>White Coffee</h3><span class="mi-price">30k</span></div></li>
+        <li class="mi"><div class="mi-row"><h3>Flavoured Latte</h3><span class="mi-price">37k</span></div><p>Caramel, hazelnut, or vanilla.</p></li>
+        <li class="mi"><div class="mi-row"><h3>Blau Signature</h3><span class="mi-price">38k</span></div></li>
+        <li class="mi"><div class="mi-row"><h3>Black Magic</h3><span class="mi-price">40k</span></div></li>
+        <li class="mi"><div class="mi-row"><h3>Kopi Susu Bro</h3><span class="mi-price">25k</span></div></li>
+        <li class="mi"><div class="mi-row"><h3>Mazzagrat</h3><span class="mi-price">30k</span></div><p>Coffee mocktail — espresso shaken with orange juice.</p></li>
+        <li class="mi"><div class="mi-row"><h3>Seasalt Latte</h3><span class="mi-price">35k</span></div><p>Latte with house-made sea salt foam on top.</p></li>
+        <li class="mi"><div class="mi-row"><h3>Affogato</h3><span class="mi-price">35k</span></div></li>
+        <li class="mi"><div class="mi-row"><h3>Peacano</h3><span class="mi-price">30k</span></div></li>
+        <li class="mi"><div class="mi-row"><h3>Cold Brew</h3><span class="mi-price">35k</span></div></li>
+        <li class="mi"><div class="mi-row"><h3>Cold Brew Flavoured</h3><span class="mi-price">40k</span></div></li>
+        <li class="mi"><div class="mi-row"><h3>Irish Coffee</h3><span class="mi-price">58k</span></div></li>
+        <li class="mi"><div class="mi-row"><h3>Manual Brew V60</h3><span class="mi-price">40k / 50k</span></div><p>Regular or guest beans.</p></li>
+        <li class="mi"><div class="mi-row"><h3>Speculoos Latte</h3><span class="mi-price">40k</span></div><p>Latte with a hint of cinnamon and a Lotus Biscoff biscuit on the side.</p></li>
+        <li class="mi"><div class="mi-row"><h3>Butterscotch Latte</h3><span class="mi-price">40k</span></div><p>A mixture of butter and palm sugar coffee, topped with our house-made sea salt foam.</p></li>
+        <li class="mi"><div class="mi-row"><h3>Banana Oat Latte</h3><span class="mi-price">45k</span></div><p>Oatmilk coffee latte with a hint of banana, topped with biscuit crunch.</p></li>
+      </ul>
+    </section>
+
+    <section class="mcat" id="refreshments" aria-labelledby="refreshments-h">
+      <div class="mcat-head"><h2 id="refreshments-h">Refreshments</h2><span class="mcat-count">6 items</span></div>
+      <ul class="mlist">
+        <li class="mi"><div class="mi-row"><h3>Iced Lychee Tea</h3><span class="mi-price">35k</span></div></li>
+        <li class="mi"><div class="mi-row"><h3>Iced Strawberry Tea</h3><span class="mi-price">35k</span></div></li>
+        <li class="mi"><div class="mi-row"><h3>Iced Lime</h3><span class="mi-price">30k</span></div></li>
+        <li class="mi"><div class="mi-row"><h3>Lemon Tea</h3><span class="mi-price">30k</span></div></li>
+        <li class="mi"><div class="mi-row"><h3>Honey Lemonade</h3><span class="mi-price">35k</span></div></li>
+        <li class="mi"><div class="mi-row"><h3>Iced Tea</h3><span class="mi-price">15k</span></div></li>
+      </ul>
+    </section>
+
+    <section class="mcat" id="non-coffee" aria-labelledby="non-coffee-h">
+      <div class="mcat-head"><h2 id="non-coffee-h">Non Coffee</h2><span class="mcat-count">9 items</span></div>
+      <ul class="mlist">
+        <li class="mi"><div class="mi-row"><h3>Chocolate</h3><span class="mi-price">37k</span></div></li>
+        <li class="mi"><div class="mi-row"><h3>Choco Hazelnut</h3><span class="mi-price">40k</span></div></li>
+        <li class="mi"><div class="mi-row"><h3>Choco Mint</h3><span class="mi-price">40k</span></div></li>
+        <li class="mi"><div class="mi-row"><h3>Matcha</h3><span class="mi-price">37k</span></div></li>
+        <li class="mi"><div class="mi-row"><h3>Taro</h3><span class="mi-price">35k</span></div></li>
+        <li class="mi"><div class="mi-row"><h3>Thai Tea</h3><span class="mi-price">30k</span></div></li>
+        <li class="mi"><div class="mi-row"><h3>Artisan Tea</h3><span class="mi-price">45k</span></div></li>
+        <li class="mi"><div class="mi-row"><h3>Mineral Water</h3><span class="mi-price">12k</span></div></li>
+        <li class="mi"><div class="mi-row"><h3>Add On Seasalt Foam</h3><span class="mi-price">+6k</span></div></li>
+      </ul>
+    </section>
+
+    <section class="mcat" id="juice" aria-labelledby="juice-h">
+      <div class="mcat-head"><h2 id="juice-h">Juice</h2><span class="mcat-count">11 items</span></div>
+      <ul class="mlist">
+        <li class="mi"><div class="mi-row"><h3>Soursop</h3><span class="mi-price">37k</span></div></li>
+        <li class="mi"><div class="mi-row"><h3>Guava</h3><span class="mi-price">37k</span></div></li>
+        <li class="mi"><div class="mi-row"><h3>Mango</h3><span class="mi-price">37k</span></div></li>
+        <li class="mi"><div class="mi-row"><h3>Avocado (Coffee / Chocolate)</h3><span class="mi-price">45k / 40k</span></div></li>
+        <li class="mi"><div class="mi-row"><h3>Sun-Kissed</h3><span class="mi-price">40k</span></div><p>Sunkist &amp; orange.</p></li>
+        <li class="mi"><div class="mi-row"><h3>Mix Berry Yogo</h3><span class="mi-price">48k</span></div><p>Yoghurt, strawberry, blueberry, raspberry &amp; milk.</p></li>
+        <li class="mi"><div class="mi-row"><h3>Green Detox</h3><span class="mi-price">48k</span></div><p>Green apple, pineapple, lemon, kale.</p></li>
+        <li class="mi"><div class="mi-row"><h3>Immune</h3><span class="mi-price">48k</span></div><p>Mango, carrot, passion fruit, orange.</p></li>
+        <li class="mi"><div class="mi-row"><h3>Choco Banana</h3><span class="mi-price">48k</span></div><p>Banana, dark chocolate &amp; milk.</p></li>
+        <li class="mi"><div class="mi-row"><h3>Banana Berries</h3><span class="mi-price">48k</span></div><p>Banana, raspberries, strawberry, blueberry.</p></li>
+        <li class="mi"><div class="mi-row"><h3>Booster</h3><span class="mi-price">48k</span></div><p>Red dragon fruit, soursop, strawberry, pineapple.</p></li>
+      </ul>
+    </section>
+
+    <div class="menu-cta">
+      <p>Ready to order? We're on GoFood and GrabFood, or reach us directly.</p>
+      <div class="menu-cta-links">
+        <a class="solid" href="https://wa.me/6281999718181">WhatsApp</a>
+        <a href="https://gofood.co.id/en/jakarta/restaurant/blau-eatery-coffee-41353093-a30a-4326-bda5-1f50cb8c7658">GoFood</a>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<footer class="site-footer">
+  <div class="footer-main">
+    <div class="f-brand">
+      <img src="assets/brand/blau-navy.png" alt="BLAU">
+    </div>
+
+    <nav class="f-col" aria-label="Visit">
+      <h3>Visit</h3>
+      <ul>
+        <li><span>Jl. Pelepah Elok I QA2/7</span></li>
+        <li><span>Kelapa Gading, Jakarta Utara</span></li>
+        <li><span>Daily, 10.00&ndash;22.00</span></li>
+        <li><a href="https://maps.google.com/?q=Blau+Eatery+%26+Coffee+Kelapa+Gading">Get directions</a></li>
+      </ul>
+    </nav>
+
+    <nav class="f-col" aria-label="Order now">
+      <h3>Order Now</h3>
+      <ul>
+        <li><a href="https://wa.me/6281999718181">WhatsApp</a></li>
+        <li><a href="https://gofood.co.id/en/jakarta/restaurant/blau-eatery-coffee-41353093-a30a-4326-bda5-1f50cb8c7658">GoFood</a></li>
+        <li><a href="#">GrabFood</a></li>
+        <li><a href="menu.html" aria-current="page">Menu</a></li>
+        <li><a href="shop.html">Shop</a></li>
+      </ul>
+    </nav>
+
+    <div class="f-col f-socials">
+      <h3>Our Socials</h3>
+      <ul class="f-icons">
+        <li>
+          <a href="https://www.instagram.com/blau.id/" aria-label="BLAU on Instagram">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+              <rect x="3" y="3" width="18" height="18" rx="5"/>
+              <circle cx="12" cy="12" r="4"/>
+              <circle cx="17.3" cy="6.7" r="1.15" fill="currentColor" stroke="none"/>
+            </svg>
+          </a>
+        </li>
+        <li>
+          <a href="https://www.facebook.com/blau.eatery/" aria-label="BLAU on Facebook">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M13.5 21v-8h2.7l.4-3.1h-3.1V7.9c0-.9.25-1.5 1.55-1.5h1.65V3.6c-.29-.04-1.27-.13-2.4-.13-2.38 0-4 1.45-4 4.11V9.9H7.6V13h2.7v8h3.2z"/>
+            </svg>
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <div class="f-cta">
+      <a class="f-btn solid" href="index.html#loyalty">Loyalty Card</a>
+      <a class="f-btn ghost" href="https://wa.me/6281999718181">Book Now</a>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <div class="footer-bottom-in">
+      <span>&copy; 2026 BLAU Eatery &amp; Coffee. All rights reserved.</span>
+      <nav aria-label="Legal">
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms &amp; Conditions</a>
+      </nav>
+      <span>Kelapa Gading, Jakarta</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var btn = document.querySelector('.nav-toggle');
+  var drawer = document.getElementById('drawer');
+  if(!btn || !drawer) return;
+
+  function setOpen(open){
+    drawer.dataset.open = open ? 'true' : 'false';
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    btn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    document.body.style.overflow = open ? 'hidden' : '';
+  }
+  btn.addEventListener('click', function(){
+    setOpen(drawer.dataset.open !== 'true');
+  });
+  drawer.addEventListener('click', function(e){
+    if(e.target.closest('a') || e.target.closest('.drawer-close')) setOpen(false);
+  });
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape' && drawer.dataset.open === 'true'){ setOpen(false); btn.focus(); }
+  });
+})();
+
+/* Sticky category tabs — highlight whichever section is currently in view. */
+(function(){
+  var tabs = [].slice.call(document.querySelectorAll('#mtabs a'));
+  var sections = [].slice.call(document.querySelectorAll('.mcat'));
+  if(!tabs.length || !sections.length || !('IntersectionObserver' in window)) return;
+
+  var byId = {};
+  tabs.forEach(function(t){ byId[t.getAttribute('href').slice(1)] = t; });
+
+  var current = null;
+  function setActive(id){
+    if(id === current) return;
+    current = id;
+    tabs.forEach(function(t){ t.classList.remove('is-active'); });
+    var t = byId[id];
+    if(t){
+      t.classList.add('is-active');
+      var wrap = document.getElementById('mtabs');
+      var left = t.offsetLeft - 24, right = t.offsetLeft + t.offsetWidth + 24;
+      if(left < wrap.scrollLeft) wrap.scrollTo({left:left, behavior:'smooth'});
+      else if(right > wrap.scrollLeft + wrap.clientWidth) wrap.scrollTo({left:right - wrap.clientWidth, behavior:'smooth'});
+    }
+  }
+
+  var tabsH = document.querySelector('.mtabs-wrap').offsetHeight;
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting) setActive(e.target.id);
+    });
+  }, { rootMargin: '-' + (72 + tabsH + 1) + 'px 0px -70% 0px', threshold: 0 });
+  sections.forEach(function(s){ io.observe(s); });
+})();
+</script>
+</body>
+</html>

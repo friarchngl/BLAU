@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Shop — BLAU Eatery &amp; Coffee</title>
+<meta name="description" content="BLAU to take home — Coffee Bulk Order bottles and Open Kitchen frozen packs. Kelapa Gading, Jakarta.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap">
+
+<style>
+/* ============================================================
+   BLAU — design tokens (kept identical to index.html / menu.html)
+   ============================================================ */
+:root{
+  --blau-navy:     #133A6B;
+  --blau-cream:    #F7F3EB;
+  --blau-navy-deep:#0C2445;
+  --blau-navy-mid: #1D4E86;
+
+  --hero-text:     var(--blau-cream);
+  --hero-dim:      rgba(247,243,235,.82);
+  --hero-rule:     rgba(247,243,235,.28);
+
+  --font: "Poppins", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  --gutter: clamp(20px, 4vw, 52px);
+  --header-h: 72px;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family:var(--font);
+  background:var(--blau-cream);
+  color:var(--blau-navy);
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+img{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+
+.skip{
+  position:absolute;left:-9999px;top:0;z-index:100;
+  background:var(--blau-cream);color:var(--blau-navy-deep);
+  padding:12px 18px;font-size:14px;font-weight:500;
+}
+.skip:focus{left:var(--gutter);top:12px}
+
+/* ============================================================
+   HEADER — same component as menu.html. No hero to blend into,
+   so it starts (and stays) solid.
+   ============================================================ */
+.site-header{
+  position:fixed;inset:0 0 auto 0;z-index:20;
+  height:var(--header-h);
+  display:flex;align-items:center;justify-content:space-between;
+  gap:24px;padding:0 var(--gutter);
+  background:var(--blau-navy-deep);
+  box-shadow:0 1px 0 rgba(247,243,235,.12);
+}
+
+.header-left{display:flex;align-items:center;gap:clamp(10px,3vw,16px)}
+.brand{display:flex;align-items:center;height:100%}
+.brand img{height:19px;width:auto}
+@media (max-width:640px){.brand img{height:16px}}
+
+.nav{display:flex;align-items:center;gap:clamp(4px,1.1vw,14px)}
+.nav > a{
+  position:relative;overflow:hidden;
+  display:grid;place-items:center;
+  font-size:15px;font-weight:400;letter-spacing:.01em;line-height:1;
+  padding:9px 12px;color:var(--hero-text);
+}
+.nav > a::before{
+  content:attr(data-label);
+  position:absolute;inset:0;
+  display:grid;place-items:center;
+  background:var(--blau-cream);color:var(--blau-navy-deep);
+  clip-path:inset(0 100% 0 0);
+  transition:clip-path .42s cubic-bezier(.4,0,.2,1);
+}
+.nav > a:hover::before,.nav > a:focus-visible::before{clip-path:inset(0 0 0 0)}
+
+/* current-page cue — same underline language as the CTA uses at rest */
+.nav > a[aria-current="page"]{font-weight:600}
+.nav > a[aria-current="page"]::after{
+  content:"";position:absolute;left:12px;right:12px;bottom:6px;
+  height:1px;background:var(--blau-cream);
+}
+
+.nav > a.cta{font-weight:600;letter-spacing:.06em;text-transform:uppercase;font-size:14px}
+.nav > a.cta::after{
+  content:"";position:absolute;left:12px;right:12px;bottom:5px;
+  height:1px;background:var(--blau-cream);
+  transition:background-color .3s ease .12s;
+}
+.nav > a.cta:hover::after{background:var(--blau-navy-deep)}
+
+@media (prefers-reduced-motion:reduce){
+  .nav > a::before{transition-duration:.15s}
+}
+
+a:focus-visible,button:focus-visible{outline:2px solid var(--blau-cream);outline-offset:6px}
+
+.nav-toggle{
+  display:none;align-items:center;justify-content:center;
+  width:38px;height:38px;padding:0;flex:none;
+  background:none;cursor:pointer;color:var(--hero-text);
+  border:1px solid rgba(247,243,235,.4);
+}
+.nav-toggle span{
+  display:block;width:18px;height:1px;background:currentColor;position:relative;
+  transition:background-color .2s ease;
+}
+.nav-toggle span::before,.nav-toggle span::after{
+  content:"";position:absolute;left:0;width:18px;height:1px;background:currentColor;
+  transition:transform .3s cubic-bezier(.4,0,.2,1), top .3s cubic-bezier(.4,0,.2,1);
+}
+.nav-toggle span::before{top:-6px}
+.nav-toggle span::after{top:6px}
+.nav-toggle[aria-expanded="true"] span{background:transparent}
+.nav-toggle[aria-expanded="true"] span::before{top:0;transform:rotate(45deg)}
+.nav-toggle[aria-expanded="true"] span::after{top:0;transform:rotate(-45deg)}
+
+@media (max-width:900px){
+  .nav > a:not(.cta){display:none}
+  .nav-toggle{display:inline-flex}
+}
+
+.drawer{
+  position:fixed;inset:var(--header-h) 0 0 0;z-index:19;
+  background:var(--blau-navy-deep);
+  display:flex;flex-direction:column;
+  overflow-y:auto;overscroll-behavior:contain;
+  opacity:0;pointer-events:none;transform:translateY(-8px);
+  transition:opacity .3s ease, transform .3s ease;
+}
+.drawer[data-open="true"]{opacity:1;transform:none;pointer-events:auto}
+
+.drawer-nav{display:flex;flex-direction:column}
+.drawer-nav a{
+  display:grid;place-items:center;text-align:center;
+  padding:clamp(20px,4.6vh,36px) 20px;
+  border-bottom:1px solid rgba(247,243,235,.16);
+  font-size:clamp(21px,6.2vw,30px);font-weight:400;line-height:1.1;
+  color:var(--blau-cream);
+}
+.drawer-social{
+  display:flex;justify-content:center;align-items:center;gap:34px;
+  padding:24px 20px;border-bottom:1px solid rgba(247,243,235,.16);
+}
+.drawer-social a{display:grid;place-items:center;color:var(--blau-cream)}
+.drawer-social svg{width:21px;height:21px}
+.drawer-close{
+  width:100%;padding:22px 20px;
+  background:none;border:0;cursor:pointer;
+  font-family:inherit;font-size:15px;font-weight:500;letter-spacing:.08em;
+  color:rgba(247,243,235,.78);
+}
+.drawer-close:hover{color:var(--blau-cream)}
+
+@media (min-width:901px){.drawer{display:none}}
+
+/* ============================================================
+   SHOP PAGE — masthead + two poster-grid catalogues. Layout
+   (hairline-bordered cells, name/price row, one-line description)
+   follows the reference the user supplied; colours and type stay
+   on BLAU's own tokens rather than the reference's palette.
+   ============================================================ */
+.shop-hero{
+  padding:calc(var(--header-h) + 48px) var(--gutter) 8px;
+  max-width:1180px;margin:0 auto;
+  text-align:center;
+}
+.shop-hero h1{
+  margin:0;
+  font-size:clamp(40px,7vw,84px);font-weight:700;line-height:.94;letter-spacing:-.025em;
+  text-transform:uppercase;color:var(--blau-navy);
+}
+
+.shop-section{max-width:1180px;margin:0 auto;padding:clamp(52px,7vw,84px) var(--gutter) 0}
+.shop-section:last-of-type{padding-bottom:clamp(56px,7vw,84px)}
+.shop-section-head{
+  display:flex;align-items:baseline;justify-content:space-between;gap:16px;
+  margin-bottom:clamp(24px,3vw,36px);
+}
+.shop-section-head h2{
+  margin:0;
+  font-size:clamp(26px,3.6vw,40px);font-weight:700;letter-spacing:-.02em;
+  text-transform:uppercase;color:var(--blau-navy);
+}
+.shop-section-head p{
+  margin:0;max-width:34ch;text-align:right;
+  font-size:13px;font-weight:300;line-height:1.5;color:rgba(19,58,107,.6);
+}
+@media (max-width:640px){
+  .shop-section-head{flex-direction:column;align-items:flex-start}
+  .shop-section-head p{text-align:left}
+}
+
+/* the grid draws its own hairline rules: container takes top+left,
+   each cell takes right+bottom, so every line in the grid is single-width */
+.shop-grid{
+  list-style:none;margin:0;padding:0;
+  display:grid;grid-template-columns:repeat(2,minmax(0,1fr));
+  border-top:1px solid rgba(19,58,107,.22);
+  border-left:1px solid rgba(19,58,107,.22);
+}
+@media (max-width:620px){.shop-grid{grid-template-columns:1fr}}
+
+.shop-card{
+  display:block;
+  border-right:1px solid rgba(19,58,107,.22);
+  border-bottom:1px solid rgba(19,58,107,.22);
+}
+.shop-card-art{
+  position:relative;overflow:hidden;
+  background:var(--blau-cream);
+}
+.shop-card.is-bottle .shop-card-art{aspect-ratio:440/696}
+.shop-card.is-kitchen .shop-card-art{aspect-ratio:1/1}
+.shop-card-art img{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;
+  transition:opacity .45s ease, transform .5s cubic-bezier(.2,.7,.3,1);
+}
+.shop-card.is-bottle .shop-card-art img{transition:transform .5s cubic-bezier(.2,.7,.3,1)}
+.shop-card:hover .shop-card-art img{transform:scale(1.035)}
+
+/* kitchen items only: packaging shot crossfades to the bare product */
+.shop-card .art-bare{opacity:0}
+.shop-card:hover .art-pack,.shop-card:focus-visible .art-pack{opacity:0}
+.shop-card:hover .art-bare,.shop-card:focus-visible .art-bare{opacity:1}
+
+.shop-card-body{padding:clamp(16px,2vw,22px) clamp(18px,2.2vw,26px) clamp(20px,2.6vw,28px)}
+.shop-card-row{
+  display:flex;align-items:baseline;justify-content:space-between;gap:12px;
+  margin-bottom:6px;
+}
+.shop-card-row h3{
+  margin:0;
+  font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--blau-navy);
+}
+.shop-card-meta{
+  font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+  color:rgba(19,58,107,.55);white-space:nowrap;
+}
+.shop-card p{
+  margin:0;font-size:13px;font-weight:300;line-height:1.5;color:rgba(19,58,107,.62);
+}
+
+/* order-in band, sits between the last category and the footer */
+.shop-cta{
+  margin-top:8px;padding:clamp(8px,2vw,16px) 0 clamp(56px,7vw,84px);
+  max-width:1180px;margin-left:auto;margin-right:auto;padding-left:var(--gutter);padding-right:var(--gutter);
+  text-align:center;
+}
+.shop-cta p{margin:0 0 18px;font-size:14px;font-weight:300;color:rgba(19,58,107,.7)}
+.shop-cta a{
+  display:inline-block;padding:14px 30px;border-radius:999px;
+  background:var(--blau-navy);color:var(--blau-cream);
+  font-size:13px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+  transition:background-color .25s ease;
+}
+.shop-cta a:hover{background:var(--blau-navy-deep)}
+
+/* ============================================================
+   FOOTER — identical component to the homepage
+   ============================================================ */
+.site-footer{background:var(--blau-cream);color:var(--blau-navy)}
+.footer-main{
+  max-width:1280px;margin:0 auto;
+  padding:clamp(40px,5vw,62px) var(--gutter);
+  display:grid;
+  grid-template-columns:auto repeat(3,minmax(0,1fr)) minmax(260px,320px);
+  gap:clamp(28px,3.2vw,48px);
+  align-items:start;
+}
+.f-brand img{width:clamp(96px,11vw,140px);height:auto}
+.f-col h3{
+  margin:0 0 16px;
+  font-size:13px;font-weight:600;letter-spacing:.09em;
+  text-transform:uppercase;color:var(--blau-navy);
+}
+.f-col ul{list-style:none;margin:0;padding:0;display:grid;gap:11px}
+.f-col a,.f-col span{
+  font-size:15px;font-weight:300;line-height:1.35;
+  color:rgba(19,58,107,.82);
+}
+.f-col a{position:relative;transition:color .25s ease}
+.f-col a:hover{color:var(--blau-navy)}
+.f-col ul.f-icons{
+  display:flex;flex-direction:row;flex-wrap:wrap;
+  gap:12px;margin:0;padding:0;list-style:none;
+}
+.f-icons a{
+  display:grid;place-items:center;width:44px;height:44px;
+  border:1px solid rgba(19,58,107,.35);border-radius:50%;
+  color:var(--blau-navy);
+  transition:background-color .25s ease,color .25s ease,border-color .25s ease;
+}
+.f-icons a:hover{background:var(--blau-navy);color:var(--blau-cream);border-color:var(--blau-navy)}
+.f-icons svg{width:19px;height:19px;display:block}
+.f-cta{
+  border-left:1px solid rgba(19,58,107,.18);
+  padding-left:clamp(24px,2.6vw,40px);
+  display:grid;gap:14px;align-content:start;
+}
+.f-btn{
+  display:block;text-align:center;
+  padding:15px 20px;border-radius:999px;
+  font-size:14px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+  border:1.5px solid var(--blau-navy);
+  transition:background-color .28s ease,color .28s ease;
+}
+.f-btn.solid{background:var(--blau-navy);color:var(--blau-cream)}
+.f-btn.solid:hover{background:var(--blau-navy-deep);border-color:var(--blau-navy-deep)}
+.f-btn.ghost{background:transparent;color:var(--blau-navy)}
+.f-btn.ghost:hover{background:var(--blau-navy);color:var(--blau-cream)}
+.footer-bottom{border-top:1px solid rgba(19,58,107,.18)}
+.footer-bottom-in{
+  max-width:1280px;margin:0 auto;
+  padding:18px var(--gutter);
+  display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;
+  gap:10px 28px;
+  font-size:13px;font-weight:300;color:rgba(19,58,107,.66);
+}
+.footer-bottom-in nav{display:flex;flex-wrap:wrap;gap:10px 26px}
+.footer-bottom-in a{transition:color .25s ease}
+.footer-bottom-in a:hover{color:var(--blau-navy)}
+
+@media (max-width:1080px){
+  .footer-main{grid-template-columns:repeat(3,minmax(0,1fr))}
+  .f-brand{grid-column:1/-1}
+  .f-cta{
+    grid-column:1/-1;
+    border-left:0;padding-left:0;
+    padding-top:26px;border-top:1px solid rgba(19,58,107,.18);
+  }
+}
+@media (max-width:620px){
+  .footer-main{grid-template-columns:1fr 1fr}
+  .f-socials{grid-column:1/-1}
+  .f-icons{flex-direction:row}
+}
+</style>
+</head>
+<body>
+
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site-header">
+  <div class="header-left">
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="drawer" aria-label="Open menu">
+      <span></span>
+    </button>
+    <a class="brand" href="index.html" aria-label="BLAU — home">
+      <img src="assets/brand/blau-cream.png" alt="BLAU">
+    </a>
+  </div>
+
+  <nav class="nav" aria-label="Primary">
+    <a href="menu.html" data-label="Menu">Menu</a>
+    <a href="shop.html" data-label="Shop" aria-current="page">Shop</a>
+    <a href="index.html#whatson" data-label="What&rsquo;s On">What&rsquo;s On</a>
+    <a class="cta" href="https://wa.me/6281999718181" data-label="Book Now">Book Now</a>
+  </nav>
+</header>
+
+<div class="drawer" id="drawer" data-open="false">
+  <nav class="drawer-nav" aria-label="Mobile">
+    <a href="menu.html">Menu</a>
+    <a href="shop.html">Shop</a>
+    <a href="index.html#whatson">What&rsquo;s On</a>
+    <a href="https://wa.me/6281999718181">Book Now</a>
+  </nav>
+  <div class="drawer-social">
+    <a href="https://www.instagram.com/blau.id/" aria-label="BLAU on Instagram">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+        <rect x="3" y="3" width="18" height="18" rx="5"/>
+        <circle cx="12" cy="12" r="4"/>
+        <circle cx="17.3" cy="6.7" r="1.15" fill="currentColor" stroke="none"/>
+      </svg>
+    </a>
+    <a href="https://www.facebook.com/blau.eatery/" aria-label="BLAU on Facebook">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+        <path d="M13.5 21v-8h2.7l.4-3.1h-3.1V7.9c0-.9.25-1.5 1.55-1.5h1.65V3.6c-.29-.04-1.27-.13-2.4-.13-2.38 0-4 1.45-4 4.11V9.9H7.6V13h2.7v8h3.2z"/>
+      </svg>
+    </a>
+  </div>
+  <button class="drawer-close" type="button">Close</button>
+</div>
+
+<main id="main">
+
+  <section class="shop-hero">
+    <h1>Shop</h1>
+  </section>
+
+  <section class="shop-section" aria-labelledby="bulk-h">
+    <div class="shop-section-head">
+      <h2 id="bulk-h">Coffee Bulk Order</h2>
+      <p>Bottled by the litre for the office, the flight, or the fridge. Ask a flavour's price on WhatsApp.</p>
+    </div>
+    <ul class="shop-grid">
+      <li>
+        <a class="shop-card is-bottle" href="https://wa.me/6281999718181?text=Hi%20BLAU%2C%20I'd%20like%20to%20order%20the%20Blau%20Signature%20bulk%20bottle.">
+          <div class="shop-card-art"><img src="assets/bottles/blau-signature.jpg" alt="BLAU Blau Signature bulk bottle"></div>
+          <div class="shop-card-body">
+            <div class="shop-card-row"><h3>Blau Signature</h3><span class="shop-card-meta">Ask on WhatsApp</span></div>
+            <p>The house pour, bottled as it is served.</p>
+          </div>
+        </a>
+      </li>
+      <li>
+        <a class="shop-card is-bottle" href="https://wa.me/6281999718181?text=Hi%20BLAU%2C%20I'd%20like%20to%20order%20the%20Kopi%20Susu%20Bro%20bulk%20bottle.">
+          <div class="shop-card-art"><img src="assets/bottles/kopi-susu-bro.jpg" alt="BLAU Kopi Susu Bro bulk bottle"></div>
+          <div class="shop-card-body">
+            <div class="shop-card-row"><h3>Kopi Susu Bro</h3><span class="shop-card-meta">Ask on WhatsApp</span></div>
+            <p>Palm sugar and milk. The everyday one.</p>
+          </div>
+        </a>
+      </li>
+      <li>
+        <a class="shop-card is-bottle" href="https://wa.me/6281999718181?text=Hi%20BLAU%2C%20I'd%20like%20to%20order%20the%20Latte%20bulk%20bottle.">
+          <div class="shop-card-art"><img src="assets/bottles/latte.jpg" alt="BLAU Latte bulk bottle"></div>
+          <div class="shop-card-body">
+            <div class="shop-card-row"><h3>Latte</h3><span class="shop-card-meta">Ask on WhatsApp</span></div>
+            <p>Espresso and milk, balanced for keeping cold.</p>
+          </div>
+        </a>
+      </li>
+      <li>
+        <a class="shop-card is-bottle" href="https://wa.me/6281999718181?text=Hi%20BLAU%2C%20I'd%20like%20to%20order%20the%20Americano%20bulk%20bottle.">
+          <div class="shop-card-art"><img src="assets/bottles/americano.jpg" alt="BLAU Americano bulk bottle"></div>
+          <div class="shop-card-body">
+            <div class="shop-card-row"><h3>Americano</h3><span class="shop-card-meta">Ask on WhatsApp</span></div>
+            <p>Straight and cold. Nothing added.</p>
+          </div>
+        </a>
+      </li>
+      <li>
+        <a class="shop-card is-bottle" href="https://wa.me/6281999718181?text=Hi%20BLAU%2C%20I'd%20like%20to%20order%20the%20Chocolate%20bulk%20bottle.">
+          <div class="shop-card-art"><img src="assets/bottles/chocolate.jpg" alt="BLAU Chocolate bulk bottle"></div>
+          <div class="shop-card-body">
+            <div class="shop-card-row"><h3>Chocolate</h3><span class="shop-card-meta">Ask on WhatsApp</span></div>
+            <p>Dark and thick, not sweet.</p>
+          </div>
+        </a>
+      </li>
+      <li>
+        <a class="shop-card is-bottle" href="https://wa.me/6281999718181?text=Hi%20BLAU%2C%20I'd%20like%20to%20order%20the%20Matcha%20bulk%20bottle.">
+          <div class="shop-card-art"><img src="assets/bottles/matcha.jpg" alt="BLAU Matcha bulk bottle"></div>
+          <div class="shop-card-body">
+            <div class="shop-card-row"><h3>Matcha</h3><span class="shop-card-meta">Ask on WhatsApp</span></div>
+            <p>Stone-ground, whisked to order.</p>
+          </div>
+        </a>
+      </li>
+      <li>
+        <a class="shop-card is-bottle" href="https://wa.me/6281999718181?text=Hi%20BLAU%2C%20I'd%20like%20to%20order%20the%20Taro%20bulk%20bottle.">
+          <div class="shop-card-art"><img src="assets/bottles/taro.jpg" alt="BLAU Taro bulk bottle"></div>
+          <div class="shop-card-body">
+            <div class="shop-card-row"><h3>Taro</h3><span class="shop-card-meta">Ask on WhatsApp</span></div>
+            <p>Creamy, mild, and quietly popular.</p>
+          </div>
+        </a>
+      </li>
+      <li>
+        <a class="shop-card is-bottle" href="https://wa.me/6281999718181?text=Hi%20BLAU%2C%20I'd%20like%20to%20order%20the%20Thai%20Tea%20bulk%20bottle.">
+          <div class="shop-card-art"><img src="assets/bottles/thai-tea.jpg" alt="BLAU Thai Tea bulk bottle"></div>
+          <div class="shop-card-body">
+            <div class="shop-card-row"><h3>Thai Tea</h3><span class="shop-card-meta">Ask on WhatsApp</span></div>
+            <p>Strong brew, condensed milk, plenty of ice.</p>
+          </div>
+        </a>
+      </li>
+    </ul>
+  </section>
+
+  <section class="shop-section" aria-labelledby="kitchen-h">
+    <div class="shop-section-head">
+      <h2 id="kitchen-h">Open Kitchen</h2>
+      <p>What we cook here, frozen and packed to take home. Hover a card to see it out of the pack.</p>
+    </div>
+    <ul class="shop-grid">
+      <li>
+        <a class="shop-card is-kitchen" href="https://wa.me/6281999718181?text=Hi%20BLAU%2C%20I'd%20like%20to%20order%20Pisang%20Pontianak.">
+          <div class="shop-card-art">
+            <img class="art-pack" src="assets/kitchen/pisang-pack.jpg" alt="Pisang Pontianak, packed">
+            <img class="art-bare" src="assets/kitchen/pisang-bare.jpg" alt="Pisang Pontianak, out of the pack" aria-hidden="true">
+          </div>
+          <div class="shop-card-body">
+            <div class="shop-card-row"><h3>Pisang Pontianak</h3><span class="shop-card-meta">10 pcs / pack</span></div>
+            <p>Frozen banana fritters — fry them at home.</p>
+          </div>
+        </a>
+      </li>
+      <li>
+        <a class="shop-card is-kitchen" href="https://wa.me/6281999718181?text=Hi%20BLAU%2C%20I'd%20like%20to%20order%20Saikoro%20Beef.">
+          <div class="shop-card-art">
+            <img class="art-pack" src="assets/kitchen/saikoro-pack.jpg" alt="Saikoro Beef, packed">
+            <img class="art-bare" src="assets/kitchen/saikoro-bare.jpg" alt="Saikoro Beef, out of the pack" aria-hidden="true">
+          </div>
+          <div class="shop-card-body">
+            <div class="shop-card-row"><h3>Saikoro Beef</h3><span class="shop-card-meta">80 gr / pack</span></div>
+            <p>Diced beef, freezer-ready for an izakaya-style stir-fry.</p>
+          </div>
+        </a>
+      </li>
+      <li>
+        <a class="shop-card is-kitchen" href="https://wa.me/6281999718181?text=Hi%20BLAU%2C%20I'd%20like%20to%20order%20Sambal%20Korek.">
+          <div class="shop-card-art">
+            <img class="art-pack" src="assets/kitchen/sambal-pack.jpg" alt="Sambal Korek, packed">
+            <img class="art-bare" src="assets/kitchen/sambal-bare.jpg" alt="Sambal Korek, out of the pack" aria-hidden="true">
+          </div>
+          <div class="shop-card-body">
+            <div class="shop-card-row"><h3>Sambal Korek</h3><span class="shop-card-meta">700 gr / tub</span></div>
+            <p>The house sambal, a spoonful of BLAU in your own kitchen.</p>
+          </div>
+        </a>
+      </li>
+      <li>
+        <a class="shop-card is-kitchen" href="https://wa.me/6281999718181?text=Hi%20BLAU%2C%20I'd%20like%20to%20order%20the%20House%20Blend%20Drip.">
+          <div class="shop-card-art">
+            <img class="art-pack" src="assets/kitchen/dripbag-pack.jpg" alt="House Blend Drip, packed">
+            <img class="art-bare" src="assets/kitchen/dripbag-bare.jpg" alt="House Blend Drip, out of the pack" aria-hidden="true">
+          </div>
+          <div class="shop-card-body">
+            <div class="shop-card-row"><h3>House Blend Drip</h3><span class="shop-card-meta">5 sachets</span></div>
+            <p>Pour-over drip bags — BLAU's espresso roast, at your desk.</p>
+          </div>
+        </a>
+      </li>
+    </ul>
+  </section>
+
+  <div class="shop-cta">
+    <p>Ordering in bulk for an office or an event? We'll sort quantities and delivery on WhatsApp.</p>
+    <a href="https://wa.me/6281999718181">Chat on WhatsApp</a>
+  </div>
+
+</main>
+
+<footer class="site-footer">
+  <div class="footer-main">
+    <div class="f-brand">
+      <img src="assets/brand/blau-navy.png" alt="BLAU">
+    </div>
+
+    <nav class="f-col" aria-label="Visit">
+      <h3>Visit</h3>
+      <ul>
+        <li><span>Jl. Pelepah Elok I QA2/7</span></li>
+        <li><span>Kelapa Gading, Jakarta Utara</span></li>
+        <li><span>Daily, 10.00&ndash;22.00</span></li>
+        <li><a href="https://maps.google.com/?q=Blau+Eatery+%26+Coffee+Kelapa+Gading">Get directions</a></li>
+      </ul>
+    </nav>
+
+    <nav class="f-col" aria-label="Order now">
+      <h3>Order Now</h3>
+      <ul>
+        <li><a href="https://wa.me/6281999718181">WhatsApp</a></li>
+        <li><a href="https://gofood.co.id/en/jakarta/restaurant/blau-eatery-coffee-41353093-a30a-4326-bda5-1f50cb8c7658">GoFood</a></li>
+        <li><a href="#">GrabFood</a></li>
+        <li><a href="menu.html">Menu</a></li>
+        <li><a href="shop.html" aria-current="page">Shop</a></li>
+      </ul>
+    </nav>
+
+    <div class="f-col f-socials">
+      <h3>Our Socials</h3>
+      <ul class="f-icons">
+        <li>
+          <a href="https://www.instagram.com/blau.id/" aria-label="BLAU on Instagram">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true">
+              <rect x="3" y="3" width="18" height="18" rx="5"/>
+              <circle cx="12" cy="12" r="4"/>
+              <circle cx="17.3" cy="6.7" r="1.15" fill="currentColor" stroke="none"/>
+            </svg>
+          </a>
+        </li>
+        <li>
+          <a href="https://www.facebook.com/blau.eatery/" aria-label="BLAU on Facebook">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M13.5 21v-8h2.7l.4-3.1h-3.1V7.9c0-.9.25-1.5 1.55-1.5h1.65V3.6c-.29-.04-1.27-.13-2.4-.13-2.38 0-4 1.45-4 4.11V9.9H7.6V13h2.7v8h3.2z"/>
+            </svg>
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <div class="f-cta">
+      <a class="f-btn solid" href="index.html#loyalty">Loyalty Card</a>
+      <a class="f-btn ghost" href="https://wa.me/6281999718181">Book Now</a>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <div class="footer-bottom-in">
+      <span>&copy; 2026 BLAU Eatery &amp; Coffee. All rights reserved.</span>
+      <nav aria-label="Legal">
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms &amp; Conditions</a>
+      </nav>
+      <span>Kelapa Gading, Jakarta</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var btn = document.querySelector('.nav-toggle');
+  var drawer = document.getElementById('drawer');
+  if(!btn || !drawer) return;
+
+  function setOpen(open){
+    drawer.dataset.open = open ? 'true' : 'false';
+    btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    btn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    document.body.style.overflow = open ? 'hidden' : '';
+  }
+  btn.addEventListener('click', function(){
+    setOpen(drawer.dataset.open !== 'true');
+  });
+  drawer.addEventListener('click', function(e){
+    if(e.target.closest('a') || e.target.closest('.drawer-close')) setOpen(false);
+  });
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape' && drawer.dataset.open === 'true'){ setOpen(false); btn.focus(); }
+  });
+})();
+</script>
+</body>
+</html>
